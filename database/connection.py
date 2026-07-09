@@ -3,18 +3,32 @@ import mysql.connector
 from flask_sqlalchemy import SQLAlchemy
 from flask_migrate import Migrate
 
-# Instansiasi untuk sistem tracking Flask-Migrate
 db = SQLAlchemy()
 migrate = Migrate()
 
 def get_db_connection():
-    """Fungsi koneksi raw query bawaan kodemu (dipertahankan 100%)"""
-    return mysql.connector.connect(
-        host=os.getenv("DB_HOST", "localhost"),
-        user=os.getenv("DB_USER", "root"),         
-        password=os.getenv("DB_PASSWORD", ""),         
-        database=os.getenv("DB_NAME", "evoting_osis")
-    )
+    """Fungsi koneksi murni menggunakan Environment Variables"""
+    
+    db_host = os.getenv("DB_HOST", "localhost")
+    db_port = int(os.getenv("DB_PORT", 3306))
+    db_user = os.getenv("DB_USER", "root")
+    db_password = os.getenv("DB_PASSWORD", "")
+    db_name = os.getenv("DB_NAME", "evoting_osis")
+    
+    config = {
+        "host": db_host,
+        "user": db_user,
+        "password": db_password,
+        "database": db_name,
+        "port": db_port,
+    }
+
+    # Aktifkan SSL jika terhubung ke cloud Aiven
+    if "aivencloud.com" in db_host:
+        config["ssl_disabled"] = False
+        config["ssl_verify_cert"] = False
+
+    return mysql.connector.connect(**config)
 
 def catat_log(aktor, tipe_aksi, deskripsi):
     conn = None
