@@ -44,7 +44,7 @@ Flask-SocketIO==5.6.1
 Flask-SQLAlchemy==3.1.1
 fonttools==4.62.1
 frozendict==2.4.7
-gallery_dl @ https://codeberg.org/mikf/gallery-dl/archive/master.tar.gz#sha256=c28c569c76b020248283a38c80b41cf6adaf847809ea4b89c90c0b47ac5416ca
+gallery-dl
 gitdb==4.0.12
 GitPython==3.1.50
 google-ai-generativelanguage==0.6.15
