@@ -1,0 +1,627 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Gerbang Autentikasi Utama - E-Voting OSIS 2026</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        /* Mengunci total scrolling & posisi layar */
+        html, body { 
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            height: 100vh !important;
+            width: 100vw !important;
+            margin: 0 !important;
+            padding: 0 !important;
+            overflow: hidden !important;
+            touch-action: none;
+            user-select: none;
+            -webkit-user-select: none;
+        }
+
+        /* OVERRIDE SWEETALERT2 AGAR TIDAK MERUSAK LAYOUT BODY */
+        html.swal2-shown, 
+        body.swal2-shown,
+        html.swal2-height-auto,
+        body.swal2-height-auto {
+            height: 100vh !important;
+            overflow: hidden !important;
+            padding-right: 0 !important;
+        }
+
+        /* PENGUNCIAN POSISI FORM LOGIN: TETAP DI TENGAH & TIDAK TERANGKAT */
+        .viewport-center-lock {
+            position: fixed !important;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            display: flex !important;
+            align-items: center !important;
+            justify-content: center !important;
+            padding: 1rem;
+            z-index: 1;
+        }
+        
+        /* Cyber Card Utama */
+        .cyber-card-giant { 
+            background: rgba(6, 11, 25, 0.85); 
+            backdrop-filter: blur(30px); 
+            -webkit-backdrop-filter: blur(30px); 
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.8), inset 0 0 2px rgba(255, 255, 255, 0.15);
+        }
+
+        /* Ambient Glow Backplate */
+        .ambient-glow-giant {
+            position: absolute;
+            width: 100%;
+            max-width: 850px;
+            height: 550px;
+            background: radial-gradient(ellipse, rgba(79, 70, 229, 0.22) 0%, rgba(139, 92, 246, 0.04) 60%, transparent 100%);
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            z-index: -1;
+            pointer-events: none;
+            filter: blur(60px);
+        }
+
+        /* Animasi Laser Scanner */
+        .fingerprint-scanner-massive {
+            position: relative;
+            overflow: hidden;
+        }
+        .fingerprint-scanner-massive::after {
+            content: '';
+            position: absolute;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(90deg, transparent, #6366f1, #a855f7, #6366f1, transparent);
+            box-shadow: 0 0 15px #6366f1, 0 0 30px #a855f7;
+            animation: cyberScanMassive 2.5s ease-in-out infinite;
+        }
+
+        @keyframes cyberScanMassive {
+            0%, 100% { top: 0%; opacity: 0; }
+            5%, 95% { opacity: 1; }
+            50% { top: 100%; }
+        }
+
+        /* Focus State Input Form Utama */
+        .input-glow-massive:focus-within {
+            box-shadow: 0 0 25px rgba(99, 102, 241, 0.25);
+            border-color: rgba(99, 102, 241, 0.85);
+            background: #000000 !important;
+        }
+
+        /* Teks Mengkilat/Shimmer Sweep */
+        .text-shimmer {
+            background: linear-gradient(
+                110deg, 
+                #a78bfa 0%, 
+                #c084fc 35%, 
+                #ffffff 50%, 
+                #c084fc 65%, 
+                #a78bfa 100%
+            );
+            background-size: 200% auto;
+            color: transparent;
+            -webkit-background-clip: text;
+            background-clip: text;
+            animation: shineText 3.5s linear infinite;
+        }
+
+        @keyframes shineText {
+            0% { background-position: -200% 0; }
+            100% { background-position: 200% 0; }
+        }
+
+        /* Floating Effect Header */
+        .header-float {
+            animation: floatingHeader 4s ease-in-out infinite;
+        }
+
+        @keyframes floatingHeader {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-6px); }
+        }
+
+        /* ========================================================= */
+        /* STYLING POPUP SWEETALERT2 FUTURISTIK, ELEGAN & COLORFUL   */
+        /* ========================================================= */
+        .swal2-container {
+            display: flex !important;
+            align-items: center !important;
+            justify-content: center !important;
+            padding: 1rem !important;
+            backdrop-filter: none !important;
+            -webkit-backdrop-filter: none !important;
+            background: rgba(2, 6, 23, 0.75) !important;
+            z-index: 9999 !important;
+        }
+
+        .swal2-popup {
+            background: #ffffff !important;
+            border: 1px solid #e2e8f0 !important;
+            border-radius: 20px !important;
+            color: #0f172a !important;
+            width: 32rem !important;
+            max-width: 92vw !important;
+            padding: 2rem 1.75rem !important;
+            box-shadow: 0 25px 60px -10px rgba(0, 0, 0, 0.45), 0 0 20px rgba(99, 102, 241, 0.1) !important;
+            margin: 0 !important;
+            transform: none !important;
+        }
+
+        /* Judul Popup dengan Aksen Warna Indigo Deep & Gradien Soft */
+        .swal2-title { 
+            background: linear-gradient(135deg, #1e1b4b 0%, #4338ca 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            font-size: 1.5rem !important;
+            font-weight: 800 !important;
+            padding: 0 !important;
+            margin-top: 0.25rem !important;
+            margin-bottom: 0.5rem !important;
+            letter-spacing: -0.025em !important;
+        }
+
+        /* Container Isi Konten & Teks */
+        .swal2-html-container {
+            color: #334155 !important;
+            font-size: 0.925rem !important;
+            margin: 0.5rem 0 1rem 0 !important;
+            line-height: 1.6 !important;
+        }
+
+        /* Input OTP Modern dengan Aksentuasi Indigo */
+        .swal2-input {
+            background-color: #f8fafc !important;
+            border: 2px solid #cbd5e1 !important;
+            color: #1e1b4b !important;
+            border-radius: 12px !important;
+            text-align: center !important;
+            font-weight: 800 !important;
+            font-size: 1.4rem !important;
+            letter-spacing: 0.3em !important;
+            height: 3.4rem !important;
+            margin: 0.85rem auto 0.5rem auto !important;
+            box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.03) !important;
+            transition: all 0.25s ease-in-out !important;
+        }
+
+        .swal2-input:focus {
+            border-color: #6366f1 !important;
+            background-color: #ffffff !important;
+            box-shadow: 0 0 0 4px rgba(99, 102, 241, 0.18) !important;
+            outline: none !important;
+        }
+
+        /* Icon Sukses & Error Custom */
+        .swal2-icon.swal2-success {
+            border-color: #10b981 !important;
+            color: #10b981 !important;
+            margin: 0.25rem auto 0.75rem auto !important;
+        }
+        .swal2-icon.swal2-success [class^='swal2-success-line'] {
+            background-color: #10b981 !important;
+        }
+        .swal2-icon.swal2-success .swal2-success-ring {
+            border: 4px solid rgba(16, 185, 129, 0.25) !important;
+        }
+
+        /* Loading Spinner Color */
+        .swal2-loader {
+            border-color: #4f46e5 transparent #4f46e5 transparent !important;
+        }
+
+        /* ========================================================= */
+        /* STYLING HOVER TOMBOL KONFIRMASI DAN BATAL                 */
+        /* ========================================================= */
+        .swal2-actions {
+            margin-top: 1.25rem !important;
+            gap: 0.75rem !important;
+        }
+
+        /* Tombol Konfirmasi (Emerald Gradien) dengan Hover */
+        .swal2-styled.swal2-confirm {
+            background: linear-gradient(135deg, #10b981 0%, #059669 100%) !important;
+            color: #ffffff !important;
+            border-radius: 12px !important;
+            font-weight: 700 !important;
+            font-size: 0.875rem !important;
+            padding: 0.8rem 1.6rem !important;
+            box-shadow: 0 4px 14px rgba(16, 185, 129, 0.3) !important;
+            transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1) !important;
+            border: none !important;
+        }
+
+        .swal2-styled.swal2-confirm:hover {
+            background: linear-gradient(135deg, #059669 0%, #047857 100%) !important;
+            transform: translateY(-2px) !important;
+            box-shadow: 0 8px 22px rgba(16, 185, 129, 0.45) !important;
+        }
+
+        .swal2-styled.swal2-confirm:active {
+            transform: translateY(0) !important;
+            box-shadow: 0 2px 8px rgba(16, 185, 129, 0.2) !important;
+        }
+
+        /* Tombol Batal (Slate Clean) dengan Hover */
+        .swal2-styled.swal2-cancel {
+            background-color: #f1f5f9 !important;
+            color: #475569 !important;
+            border-radius: 12px !important;
+            font-weight: 700 !important;
+            font-size: 0.875rem !important;
+            padding: 0.8rem 1.6rem !important;
+            transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1) !important;
+            border: 1px solid #e2e8f0 !important;
+        }
+
+        .swal2-styled.swal2-cancel:hover {
+            background-color: #e2e8f0 !important;
+            color: #0f172a !important;
+            transform: translateY(-2px) !important;
+            border-color: #cbd5e1 !important;
+            box-shadow: 0 4px 14px rgba(148, 163, 184, 0.25) !important;
+        }
+
+        .swal2-styled.swal2-cancel:active {
+            transform: translateY(0) !important;
+        }
+    </style>
+</head>
+<body class="bg-slate-950 text-slate-100 selection:bg-indigo-500 selection:text-white">
+
+    <!-- Background Glow -->
+    <div class="absolute -top-80 -right-80 w-[600px] h-[600px] bg-indigo-600/10 rounded-full blur-[150px] pointer-events-none"></div>
+    <div class="absolute -bottom-80 -left-80 w-[600px] h-[600px] bg-purple-600/10 rounded-full blur-[150px] pointer-events-none"></div>
+
+    <!-- KONTAINER FORM LOGIN -->
+    <div class="viewport-center-lock">
+        <div class="relative w-full max-w-4xl">
+            <div class="ambient-glow-giant"></div>
+
+            <div class="cyber-card-giant border border-slate-800/80 rounded-[32px] p-6 sm:p-10 lg:p-12 relative z-10">
+                
+                <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-10 items-center">
+                    
+                    <!-- BAGIAN KIRI: BRANDING -->
+                    <div class="lg:col-span-5 text-center lg:text-left space-y-6 lg:border-r border-slate-800/50 pb-6 lg:pb-0 lg:pr-10 flex flex-col justify-center min-w-0">
+                        
+                        <div class="inline-flex relative mx-auto lg:mx-0 w-20 h-20 sm:w-24 sm:h-24 header-float">
+                            <div class="absolute inset-0 bg-gradient-to-tr from-indigo-500 to-purple-500 rounded-2xl blur-xl opacity-40"></div>
+                            
+                            <div class="fingerprint-scanner-massive relative bg-slate-950 p-4 sm:p-5 rounded-2xl border border-indigo-500/30 flex items-center justify-center shadow-xl h-full w-full z-10">
+                                <i class="bi bi-fingerprint text-4xl sm:text-5xl text-indigo-400 animate-pulse block"></i>
+                            </div>
+                        </div>
+                        
+                        <div class="space-y-3">
+                            <h1 class="font-black tracking-tight leading-tight text-center lg:text-left">
+                                <span class="block text-3xl sm:text-4xl lg:text-5xl text-white font-extrabold tracking-wider drop-shadow-[0_2px_12px_rgba(255,255,255,0.2)]">
+                                    E-VOTING
+                                </span>
+                                <span class="block text-2xl sm:text-3xl lg:text-3xl text-shimmer font-black mt-1 tracking-widest drop-shadow-[0_0_25px_rgba(168,85,247,0.45)]">
+                                    OSIS 2026
+                                </span>
+                            </h1>
+                            
+                            <div class="pt-1">
+                                <span class="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full bg-indigo-500/10 border border-indigo-500/20 text-[10px] sm:text-[11px] font-extrabold tracking-widest text-indigo-300 uppercase shadow-sm">
+                                    <i class="bi bi-shield-check text-indigo-400 text-xs"></i> Secure OTP Portal
+                                </span>
+                            </div>
+                            
+                            <p class="text-xs sm:text-sm text-slate-400 font-medium leading-relaxed max-w-sm mx-auto lg:mx-0 pt-1 text-center lg:text-left">
+                                Selamat datang di gerbang bilik suara digital. Masukkan nomor WhatsApp terdaftar Anda untuk menerima token akses masuk.
+                            </p>
+                        </div>
+                    </div>
+
+                    <!-- BAGIAN KANAN: FORM -->
+                    <div class="lg:col-span-7 space-y-5 w-full lg:pl-4">
+                        <form id="loginForm" class="space-y-5" autocomplete="off">
+                            
+                            <div class="space-y-2">
+                                <label id="inputLabel" class="flex items-center gap-2 text-xs font-bold text-slate-300 uppercase tracking-wider">
+                                    <i class="bi bi-whatsapp text-emerald-400 text-lg"></i> Nomor WhatsApp Pemilih
+                                </label>
+                                <div class="input-glow-massive flex items-center bg-slate-950/80 border border-slate-800 rounded-xl transition-all duration-300 shadow-md">
+                                    <input type="text" id="username" required 
+                                        class="w-full bg-transparent text-white placeholder-slate-700 focus:outline-none px-4 py-3.5 text-sm font-semibold tracking-wide"
+                                        placeholder="Contoh: 0857xxxxxxxx" oninput="deteksiTipeLogin()">
+                                </div>
+                            </div>
+
+                            <div id="passwordContainer" class="space-y-2 hidden">
+                                <div class="flex justify-between items-center">
+                                    <label class="flex items-center gap-2 text-xs font-bold text-slate-300 uppercase tracking-wider">
+                                        <i class="bi bi-shield-lock-fill text-indigo-400 text-lg"></i> Kunci Akses Administrator
+                                    </label>
+                                </div>
+                                <div class="input-glow-massive flex items-center bg-slate-950/80 border border-slate-800 rounded-xl transition-all duration-300 shadow-md">
+                                    <input type="password" id="password" 
+                                        class="w-full bg-transparent text-white placeholder-slate-700 focus:outline-none px-4 py-3.5 text-sm font-semibold tracking-widest"
+                                        placeholder="••••••••">
+                                </div>
+                                <div class="text-right">
+                                    <a href="/auth/forgot" class="text-xs font-bold text-indigo-400 hover:text-indigo-300 tracking-wide transition-colors">Bypass Pemulihan Operator?</a>
+                                </div>
+                            </div>
+
+                            <div class="pt-1">
+                                <button type="submit" id="submitBtn"
+                                    class="w-full relative group bg-gradient-to-r from-emerald-600 via-indigo-600 to-purple-600 hover:from-emerald-500 hover:to-purple-500 text-white font-bold py-3.5 px-5 rounded-xl text-xs sm:text-sm tracking-wider uppercase transition-all duration-300 flex items-center justify-center gap-2 shadow-lg shadow-indigo-500/20 active:scale-[0.995]">
+                                    <i class="bi bi-chat-left-dots-fill text-base"></i> 
+                                    <span id="btnText">Kirim Kode OTP Masuk</span>
+                                </button>
+                            </div>
+                        </form>
+
+                        <div class="pt-5 border-t border-slate-800/50 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs w-full overflow-hidden">
+                            <div class="flex items-center gap-2 text-slate-400 font-medium whitespace-nowrap truncate min-w-0 max-w-full">
+                                <i class="bi bi-info-circle text-slate-500 text-sm flex-shrink-0"></i>
+                                <span class="truncate">Pendaftaran akun oleh <span class="text-slate-200 font-bold">Super Admin</span>.</span>
+                            </div>
+                            
+                            <div class="flex items-center gap-2 bg-indigo-500/10 border border-indigo-500/20 text-indigo-400 px-3 py-1.5 rounded-full font-bold tracking-wide uppercase text-[10px] shadow-sm select-none flex-shrink-0 whitespace-nowrap">
+                                <span class="relative flex h-2 w-2 flex-shrink-0">
+                                    <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-indigo-400 opacity-75"></span>
+                                    <span class="relative inline-flex rounded-full h-2 w-2 bg-indigo-500"></span>
+                                </span>
+                                <i class="bi bi-shield-lock-fill"></i> Anti-Fraud Active
+                            </div>
+                        </div>
+                    </div>
+
+                </div> 
+            </div> 
+        </div>
+    </div>
+
+    <script>
+        function deteksiTipeLogin() {
+            const val = document.getElementById('username').value.trim();
+            const passContainer = document.getElementById('passwordContainer');
+            const inputLabel = document.getElementById('inputLabel');
+            const submitBtn = document.getElementById('submitBtn');
+            const btnText = document.getElementById('btnText');
+            const passInput = document.getElementById('password');
+
+            if (!val || /^\d+$/.test(val)) {
+                passContainer.classList.add('hidden');
+                passInput.removeAttribute('required');
+                inputLabel.innerHTML = `<i class="bi bi-whatsapp text-emerald-400 text-lg"></i> Nomor WhatsApp Pemilih`;
+                btnText.innerText = "Kirim Kode OTP Masuk";
+                submitBtn.className = "w-full relative group bg-gradient-to-r from-emerald-600 via-indigo-600 to-purple-600 text-white font-bold py-3.5 px-5 rounded-xl text-xs sm:text-sm tracking-wider uppercase transition-all duration-300 flex items-center justify-center gap-2 shadow-lg cursor-pointer";
+            } else {
+                passContainer.classList.remove('hidden');
+                passInput.setAttribute('required', 'required');
+                inputLabel.innerHTML = `<i class="bi bi-person-badge-fill text-indigo-400 text-lg"></i> Username Administrator`;
+                btnText.innerText = "Buka Sesi Panel Kontrol";
+                submitBtn.className = "w-full relative group bg-gradient-to-r from-indigo-600 via-purple-600 to-violet-600 text-white font-bold py-3.5 px-5 rounded-xl text-xs sm:text-sm tracking-wider uppercase transition-all duration-300 flex items-center justify-center gap-2 shadow-lg cursor-pointer";
+            }
+        }
+
+        function bersihkanNomorWA(num) {
+            let clean = num.replace(/\D/g, ''); 
+            if (clean.startsWith('628')) {
+                return clean.substring(2);
+            } else if (clean.startsWith('08')) {
+                return clean.substring(1);
+            }
+            return clean;
+        }
+
+        document.getElementById('loginForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const usernameInput = document.getElementById('username').value.trim();
+            const passwordInput = document.getElementById('password') ? document.getElementById('password').value : '';
+
+            // JALUR 1: ADMIN & SUPER ADMIN PANEL
+            if (passwordInput !== '') {
+                Swal.fire({ 
+                    title: 'Verifikasi Administrator', 
+                    html: `
+                        <div class="space-y-1 py-1">
+                            <p class="text-slate-600 font-semibold text-sm">Mengkoneksikan ke Enclave Enkripsi Data...</p>
+                            <p class="text-xs text-indigo-600 font-bold tracking-wide uppercase">⚡ Enkripsi Jalur Ganda Active</p>
+                        </div>
+                    `, 
+                    allowOutsideClick: false, 
+                    didOpen: () => Swal.showLoading() 
+                });
+                try {
+                    const res = await fetch('/api/login', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ username: usernameInput, password: passwordInput })
+                    });
+                    const data = await res.json();
+                    if (res.ok) {
+                        Swal.fire({ 
+                            icon: 'success', 
+                            title: 'Otentikasi Admin Berhasil!', 
+                            html: `
+                                <div class="space-y-2 py-1">
+                                    <p class="text-slate-700 font-medium text-sm">${data.message || 'Kredensial terverifikasi secara sah.'}</p>
+                                    <div class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-100 text-emerald-800 text-xs font-bold">
+                                        <i class="bi bi-shield-check"></i> Membuka Panel Kontrol Utama...
+                                    </div>
+                                </div>
+                            `, 
+                            timer: 1300, 
+                            showConfirmButton: false 
+                        }).then(() => {
+                            window.location.href = data.redirect;
+                        });
+                    } else {
+                        Swal.fire({ 
+                            icon: 'error', 
+                            title: 'Akses Ditolak', 
+                            html: `<p class="text-slate-600 font-medium text-sm">${data.message || 'Username atau password Administrator salah.'}</p>`, 
+                            confirmButtonColor: '#4f46e5' 
+                        });
+                    }
+                } catch {
+                    Swal.fire({ 
+                        icon: 'error', 
+                        title: 'Gangguan Server', 
+                        html: '<p class="text-slate-600 font-medium text-sm">Gagal memvalidasi kredensial ke Server Database.</p>' 
+                    });
+                }
+                return;
+            }
+
+            // JALUR 2: USER BILIK SUARA (PEMILIH)
+            Swal.fire({ 
+                title: 'Memeriksa Data DPT', 
+                html: `
+                    <div class="space-y-1 py-1">
+                        <p class="text-slate-600 font-semibold text-sm">Mengirimkan token otentikasi ke WhatsApp terdaftar...</p>
+                        <p class="text-xs text-emerald-600 font-bold tracking-wide uppercase">💬 Fonnte Gateway Active</p>
+                    </div>
+                `, 
+                allowOutsideClick: false, 
+                didOpen: () => Swal.showLoading() 
+            });
+            
+            try {
+                const resRequest = await fetch('/api/login/user/request-otp', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ nomor_wa: usernameInput })
+                });
+                const dataRequest = await resRequest.json();
+                Swal.close();
+
+                if (!resRequest.ok) {
+                    return Swal.fire({ 
+                        icon: 'error', 
+                        title: 'Nomor Tidak Terdaftar', 
+                        html: `<p class="text-slate-600 font-medium text-sm">${dataRequest.message}</p>`, 
+                        confirmButtonColor: '#4f46e5' 
+                    });
+                }
+
+                let waktuTersisa = 120; 
+                let intervalTimer;
+
+                // POPUP OTENTIKASI OTP BILIK SUARA
+                const { value: otpCode } = await Swal.fire({
+                    title: 'Verifikasi Bilik Suara',
+                    html: `
+                        <div class="space-y-3">
+                            <p class="text-xs sm:text-sm text-slate-600 font-medium leading-relaxed">
+                                Kode token otentikasi telah dikirim. Masukkan <span class="inline-block px-2 py-0.5 rounded bg-indigo-50 border border-indigo-200 text-indigo-700 font-bold">6 Digit Kode OTP</span> untuk membuka bilik suara Anda:
+                            </p>
+                            <div class="text-xs text-amber-900 font-bold bg-gradient-to-r from-amber-50 via-orange-50 to-amber-50 border border-amber-200/80 py-2.5 px-3 rounded-xl flex items-center justify-center gap-2 shadow-sm">
+                                <i class="bi bi-clock-history text-amber-600 text-sm animate-spin"></i> Masa Berlaku Sesi Token: <span id="otp-countdown" class="font-mono text-sm text-amber-950 font-extrabold">02:00</span>
+                            </div>
+                        </div>
+                    `,
+                    input: 'text',
+                    inputPlaceholder: '•• •• ••',
+                    showCancelButton: true,
+                    confirmButtonText: '<i class="bi bi-box-arrow-in-right mr-1.5"></i> Masuk Bilik Suara',
+                    cancelButtonText: '<i class="bi bi-x-circle-fill mr-1.5"></i> Batal',
+                    didOpen: () => {
+                        const countdownContainer = document.getElementById('otp-countdown');
+                        intervalTimer = setInterval(() => {
+                            waktuTersisa--;
+                            let menit = Math.floor(waktuTersisa / 60);
+                            let detik = waktuTersisa % 60;
+                            
+                            if (countdownContainer) {
+                                countdownContainer.innerText = `${menit.toString().padStart(2, '0')}:${detik.toString().padStart(2, '0')}`;
+                            }
+                            
+                            if (waktuTersisa <= 0) {
+                                clearInterval(intervalTimer);
+                                Swal.close();
+                                Swal.fire({ 
+                                    icon: 'error', 
+                                    title: 'Sesi OTP Kadaluarsa', 
+                                    html: '<p class="text-slate-600 font-medium text-sm">Batas waktu token telah habis. Silakan kirim ulang kode OTP baru.</p>', 
+                                    confirmButtonColor: '#4f46e5' 
+                                });
+                            }
+                        }, 1000);
+                    },
+                    willClose: () => {
+                        clearInterval(intervalTimer);
+                    },
+                    inputValidator: (value) => {
+                        if (!value) return 'Kode OTP wajib diisi!';
+                        if (value.length !== 6 || isNaN(value)) return 'Harus berupa 6 digit angka murni!';
+                    }
+                });
+
+                if (!otpCode) return;
+
+                Swal.fire({ 
+                    title: 'Membuka Hak Pilih', 
+                    html: `
+                        <div class="space-y-1 py-1">
+                            <p class="text-slate-600 font-semibold text-sm">Mengkoneksikan ke Enkripsi Surat Suara Digital...</p>
+                            <p class="text-xs text-indigo-600 font-bold tracking-wide uppercase">🔒 End-to-End Encrypted Vote</p>
+                        </div>
+                    `, 
+                    allowOutsideClick: false, 
+                    didOpen: () => Swal.showLoading() 
+                });
+                
+                const responseNomorBersiFrontend = bersihkanNomorWA(usernameInput);
+
+                const resVerify = await fetch('/api/login/user/verify', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ nomor_wa: responseNomorBersiFrontend, otp: otpCode })
+                });
+                const dataVerify = await resVerify.json();
+                Swal.close();
+
+                if (resVerify.ok) {
+                    Swal.fire({ 
+                        icon: 'success', 
+                        title: 'Bilik Suara Terbuka!', 
+                        html: `
+                            <div class="space-y-2 py-1">
+                                <p class="text-slate-700 font-medium text-sm">${dataVerify.message || 'Identitas DPT terverifikasi secara sah.'}</p>
+                                <div class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-100 text-emerald-800 text-xs font-bold">
+                                    <i class="bi bi-check2-circle"></i> Mengalihkan Anda ke Bilik Pencoblosan...
+                                </div>
+                            </div>
+                        `, 
+                        timer: 1300, 
+                        showConfirmButton: false 
+                    }).then(() => {
+                        window.location.href = dataVerify.redirect;
+                    });
+                } else {
+                    Swal.fire({ 
+                        icon: 'error', 
+                        title: 'Token Tidak Valid', 
+                        html: `<p class="text-slate-600 font-medium text-sm">${dataVerify.message || 'Kode OTP salah atau telah kadaluarsa.'}</p>`, 
+                        confirmButtonColor: '#4f46e5' 
+                    });
+                }
+
+            } catch (err) {
+                Swal.fire({ 
+                    icon: 'error', 
+                    title: 'Koneksi Terputus', 
+                    html: '<p class="text-slate-600 font-medium text-sm">Gagal memproses otentikasi data ke server E-Voting.</p>' 
+                });
+            }
+        });
+    </script>
+</body>
+</html>

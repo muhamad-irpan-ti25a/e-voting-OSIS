@@ -1,0 +1,613 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Super Admin - Kelola Kandidat Paslon</title>
+    <link rel="stylesheet" href="/static/css/style.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800;900&family=JetBrains+Mono:wght@700&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <style>
+        body { font-family: 'Inter', sans-serif; }
+        .font-mono-kpu { font-family: 'JetBrains Mono', monospace; }
+
+        /* SPOTIFY LAYOUT UTAMA (KONSISTEN TEMA SLATE & INDIGO) */
+        .spotify-wrapper {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 24px;
+            margin-bottom: 24px;
+        }
+        @media (min-width: 1280px) {
+            .spotify-wrapper {
+                grid-template-columns: 44fr 56fr;
+            }
+        }
+
+        .about-artist-box {
+            background-size: cover;
+            background-position: center;
+            border-radius: 20px;
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            padding: 28px 32px;
+            min-height: 360px;
+            border: 1px solid #1e293b;
+            box-shadow: inset 0 0 40px rgba(0,0,0,0.8);
+        }
+
+        .spotify-panel-dark {
+            background: #0f172a;
+            border-radius: 20px;
+            padding: 24px 28px;
+            border: 1px solid #1e293b;
+        }
+
+        .clean-scroll::-webkit-scrollbar { 
+            width: 6px; 
+        }
+        .clean-scroll::-webkit-scrollbar-track {
+            background: transparent;
+        }
+        .clean-scroll::-webkit-scrollbar-thumb { 
+            background: #1e293b; 
+            border-radius: 10px; 
+        }
+    </style>
+</head>
+<body class="bg-slate-950 text-slate-100 min-h-screen flex">
+
+    <aside class="w-72 bg-slate-900/70 backdrop-blur-xl border-r border-slate-800 flex flex-col justify-between sticky top-0 h-screen z-50 flex-shrink-0">
+        <div class="p-5">
+            <div class="flex items-center gap-3.5 pb-5 border-b border-slate-800">
+                <div class="bg-indigo-600 p-3 rounded-xl text-white shadow-lg flex items-center justify-center">
+                    <i class="bi bi-shield-check text-2xl"></i>
+                </div>
+                <div>
+                    <h2 class="font-black text-xl tracking-tight text-white leading-none">E-Vote OSIS</h2>
+                    <span class="text-[10px] bg-indigo-500/20 text-indigo-300 px-2.5 py-1 rounded-full font-black tracking-wider block mt-1.5 w-max">SUPER ADMIN</span>
+                </div>
+            </div>
+            
+            <nav class="mt-8 space-y-2">
+                <a href="/superadmin/dashboard" class="flex items-center gap-3.5 px-4 py-3 text-slate-400 hover:text-white hover:bg-slate-900/60 rounded-xl font-bold transition-colors">
+                    <i class="bi bi-grid-1x2 text-xl text-slate-500"></i> 
+                    <span class="text-sm tracking-wide">Dashboard Live</span>
+                </a>
+                <a href="/superadmin/manajemen-admin" class="flex items-center gap-3.5 px-4 py-3 text-slate-400 hover:text-white hover:bg-slate-900/60 rounded-xl font-bold transition-colors">
+                    <i class="bi bi-people text-xl text-slate-500"></i> 
+                    <span class="text-sm tracking-wide">Panitia Admin</span>
+                </a>
+                <a href="/superadmin/manajemen-paslon" class="flex items-center gap-3.5 px-4 py-3 bg-indigo-600 text-white rounded-xl font-black shadow-lg shadow-indigo-600/20 transition-colors">
+                    <i class="bi bi-person-vcard text-xl"></i> 
+                    <span class="text-sm tracking-wide">Kandidat Paslon</span>
+                </a>
+                <a href="/superadmin/data-pemilih" class="flex items-center gap-3.5 px-4 py-3 text-slate-400 hover:text-white hover:bg-slate-900/60 rounded-xl font-bold transition-colors">
+                    <i class="bi bi-person-lines-fill text-xl text-slate-500"></i> 
+                    <span class="text-sm tracking-wide">Master DPT</span>
+                </a>
+                <a href="/superadmin/quick-count" class="flex items-center gap-3.5 px-4 py-3 text-slate-400 hover:text-white hover:bg-slate-900/60 rounded-xl font-bold transition-colors">
+                    <i class="bi bi-pie-chart text-xl text-slate-500"></i> 
+                    <span class="text-sm tracking-wide">Quick Count Live</span>
+                </a>
+                <a href="/superadmin/log-aktivitas" class="flex items-center gap-3.5 px-4 py-3 text-slate-400 hover:text-white hover:bg-slate-900/60 rounded-xl font-bold transition-colors">
+                    <i class="bi bi-journal-text text-xl text-slate-500"></i> 
+                    <span class="text-sm tracking-wide">Log Audit Sistem</span>
+                </a>
+            </nav>
+        </div>
+
+        <div class="p-5 border-t border-slate-800 bg-slate-950/40">
+            <div class="flex items-center gap-3 mb-5 px-1">
+                <div class="w-11 h-11 rounded-full bg-slate-800 flex items-center justify-center border border-slate-700 shadow-inner">
+                    <i class="bi bi-person-fill text-slate-200 text-xl"></i>
+                </div>
+                <div class="truncate flex-1">
+                    <h4 class="text-sm font-bold text-white truncate leading-tight">Super Admin</h4>
+                    <span class="text-[11px] text-emerald-400 block font-bold mt-0.5">● Online</span>
+                </div>
+            </div>
+            <button onclick="handleLogout()" class="w-full flex items-center justify-center gap-2 px-4 py-3 bg-red-500/10 hover:bg-red-500 text-red-400 hover:text-white rounded-xl text-xs font-bold border border-red-500/10 hover:border-transparent transition-all">
+                <i class="bi bi-box-arrow-left text-base"></i> Keluar Sistem
+            </button>
+        </div>
+    </aside>
+
+    <main class="flex-1 p-6 lg:p-8 space-y-8 overflow-y-auto max-w-[calc(100vw-18rem)]">
+        
+        <!-- HEADER UTAMA: MANAJEMEN KANDIDAT PASLON (SUDAH DIGESER DAN DIGIVE SPACING) -->
+<header class="flex flex-col lg:flex-row justify-between lg:items-center gap-6 pb-6 mb-4 border-b border-slate-800">
+    <div>
+        <h1 class="text-2xl font-black text-white tracking-tight uppercase">MANAJEMEN KANDIDAT PASLON</h1>
+        <p class="text-slate-400 text-sm mt-1.5 font-medium leading-relaxed">
+            Daftarkan nomor urut, visi, misi, serta berkas foto resmi pasangan calon.
+        </p>
+    </div>
+    
+    <!-- WRAPPER TOMBOL AKSI: SEJAJAR DAN MEMILIKI JARAK PROPORSIONAL -->
+    <div class="flex flex-wrap items-center gap-3 shrink-0">
+        <!-- Tombol Pengocokan Nomor Urut Paslon -->
+        <a href="/superadmin/spin-paslon" class="bg-gradient-to-r from-amber-500 to-orange-600 hover:from-amber-400 hover:to-orange-500 text-slate-950 px-4 py-2.5 rounded-xl text-xs font-bold flex items-center gap-1.5 border-0 shadow-md shadow-orange-500/20 cursor-pointer transition-colors no-underline">
+    <i class="bi bi-dice-5-fill text-base"></i> Pengocokan Nomor Urut Paslon
+</a>
+
+        <!-- Tombol Pendaftaran Paslon Baru (Bawaan Kodemu) -->
+        <button onclick="openPaslonModal()" class="bg-indigo-600 hover:bg-indigo-500 text-white px-4 py-2.5 rounded-xl text-xs font-bold flex items-center gap-1.5 border-0 shadow-md shadow-indigo-600/20 cursor-pointer transition-colors">
+            <i class="bi bi-plus-circle-fill text-base"></i> Pendaftaran Paslon Baru
+        </button>
+
+        <!-- Tombol Berita Acara -->
+        <a href="/superadmin/rekap-spin" class="bg-slate-800 hover:bg-slate-700 text-slate-200 px-4 py-2.5 rounded-xl text-xs font-bold flex items-center gap-1.5 border border-slate-700 shadow-md cursor-pointer transition-colors no-underline">
+            <i class="bi bi-file-earmark-text-fill text-base text-amber-500"></i> Lihat Berita Acara Spin
+        </a>
+    </div>
+</header>
+
+        <div class="flex gap-1 border-b border-slate-800">
+            <button id="tab_aktif" onclick="switchTab('aktif')" class="px-4 py-3 border-t-0 border-x-0 border-b-2 border-indigo-500 bg-transparent text-white font-bold text-sm flex items-center gap-2 transition-all cursor-pointer">
+                <i class="bi bi-person-vcard-fill text-indigo-500 text-lg"></i> Paslon Kontestan Aktif
+            </button>
+            <button id="tab_arsip" onclick="switchTab('arsip')" class="px-4 py-3 border-t-0 border-x-0 border-b-2 border-transparent bg-transparent text-slate-400 hover:text-white font-bold text-sm flex items-center gap-2 transition-all cursor-pointer">
+                <i class="bi bi-archive-fill text-lg"></i> Histori Arsip Demokrasi
+            </button>
+        </div>
+
+        <div id="tahun_filter_wrapper" class="hidden items-center gap-3 bg-slate-900/40 p-4 border border-slate-800 rounded-xl max-w-sm shadow-md">
+            <label class="text-slate-400 font-bold text-sm whitespace-nowrap"><i class="bi bi-funnel-fill text-indigo-500"></i> Tahun Pemilu:</label>
+            <select id="filter_tahun_select" onchange="renderPaslonGrid()" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-white font-bold text-sm focus:outline-none cursor-pointer">
+                <option value="ALL">Semua Tahun Pemilu</option>
+            </select>
+        </div>
+
+        <div id="paslon_grid_container" style="display: flex; flex-direction: column; gap: 24px; width: 100%;">
+            <div class="text-center p-8 text-slate-500 font-bold text-lg">Mengambil data paslon kandidat dari server...</div>
+        </div>
+    </main>
+
+    <div id="paslon_modal" class="hidden fixed inset-0 bg-slate-950/80 backdrop-blur-md z-50 flex items-center justify-center p-4">
+        <div class="bg-slate-900 border border-slate-800 w-full max-w-2xl rounded-2xl shadow-2xl overflow-hidden">
+            <div class="p-4 border-b border-slate-800 bg-slate-950/40 flex justify-between items-center">
+                <h3 id="modal_title" class="text-base font-bold text-white uppercase">Form Registrasi Paslon</h3>
+                <button onclick="closePaslonModal()" class="text-slate-400 hover:text-white text-xl border-0 bg-transparent cursor-pointer"><i class="bi bi-x-lg"></i></button>
+            </div>
+            <form id="paslon_form" onsubmit="submitPaslonForm(event)" class="p-5" style="display: flex; flex-direction: column; gap: 12px;" enctype="multipart/form-data">
+                <input type="hidden" id="form_id" value="">
+                
+                <div style="display: grid; grid-template-columns: 1fr 1fr 2fr; gap: 12px;">
+                    <div>
+                        <label class="block text-[10px] font-bold text-slate-400 uppercase mb-1">No. Urut</label>
+                        <input type="number" id="form_nomor_urut" required min="1" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-white font-black text-center text-sm focus:border-indigo-500 focus:outline-none" placeholder="1">
+                    </div>
+                    <div>
+                        <label class="block text-[10px] font-bold text-slate-400 uppercase mb-1">Tahun Pemilu</label>
+                        <input type="number" id="form_tahun_pemilu" required class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-white font-black text-center text-sm focus:border-indigo-500 focus:outline-none">
+                    </div>
+                    <div>
+                        <label class="block text-[10px] font-bold text-slate-400 uppercase mb-1">Berkas Foto Resmi</label>
+                        <input type="file" id="form_foto" accept="image/*" class="w-full bg-slate-950 border border-slate-800 rounded-xl p-1.5 text-slate-300 text-xs focus:border-indigo-500 focus:outline-none cursor-pointer">
+                    </div>
+                </div>
+
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
+                    <div class="bg-slate-950/40 p-3 border border-slate-800 rounded-xl" style="display: flex; flex-direction: column; gap: 8px;">
+                        <label class="block text-[10px] font-bold text-indigo-400 uppercase tracking-wider">Calon Ketua</label>
+                        <input type="text" id="form_nama_ketua" required class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-white font-semibold text-xs focus:border-indigo-500 focus:outline-none" placeholder="Nama Ketua...">
+                        <input type="text" id="form_kelas_ketua" required class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-white font-semibold text-xs focus:border-indigo-500 focus:outline-none" placeholder="Kelas Ketua (Contoh: XI TKJ 1)...">
+                    </div>
+                    <div class="bg-slate-950/40 p-3 border border-slate-800 rounded-xl" style="display: flex; flex-direction: column; gap: 8px;">
+                        <label class="block text-[10px] font-bold text-violet-400 uppercase tracking-wider">Calon Wakil</label>
+                        <input type="text" id="form_nama_wakil" required class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-white font-semibold text-xs focus:border-indigo-500 focus:outline-none" placeholder="Nama Wakil...">
+                        <input type="text" id="form_kelas_wakil" required class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-white font-semibold text-xs focus:border-indigo-500 focus:outline-none" placeholder="Kelas Wakil (Contoh: X TKJ 2)...">
+                    </div>
+                </div>
+
+                <div>
+                    <label class="block text-[10px] font-bold text-slate-400 uppercase mb-1">Visi Utama Strategis</label>
+                    <textarea id="form_visi" rows="2" required class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-white font-medium text-xs focus:border-indigo-500 focus:outline-none" placeholder="Tuliskan visi utama paslon..."></textarea>
+                </div>
+                
+                <div>
+                    <label class="block text-[10px] font-bold text-slate-400 uppercase mb-1">Misi Kerja Pasangan (List Program)</label>
+                    <textarea id="form_misi" rows="3" required class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-white font-medium text-xs focus:border-indigo-500 focus:outline-none" placeholder="Tekan Enter untuk membuat baris nomor urut misi otomatis..."></textarea>
+                </div>
+
+                <div style="display: flex; gap: 10px; margin-top: 4px;">
+                    <button type="button" onclick="closePaslonModal()" class="w-1/2 bg-slate-800 hover:bg-slate-700 text-white py-2 rounded-xl font-bold border-0 text-xs cursor-pointer">Batal</button>
+                    <button type="submit" id="submit_btn" class="w-1/2 bg-indigo-600 hover:bg-indigo-500 text-white py-2 rounded-xl font-bold border-0 text-xs cursor-pointer">Daftarkan Paslon</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <div id="detail_paslon_modal" class="hidden fixed inset-0 bg-slate-950/80 backdrop-blur-md z-50 flex items-center justify-center p-4">
+        <div class="bg-slate-900 border border-slate-800 w-full max-w-xl rounded-2xl shadow-2xl overflow-hidden">
+            <div class="p-4 border-b border-slate-800 bg-slate-950/40 flex justify-between items-center">
+                <h3 class="text-sm font-bold text-indigo-400 uppercase"><i class="bi bi-fingerprint"></i> Profil Lengkap Eksklusif</h3>
+                <button onclick="closeDetailPaslonModal()" class="text-slate-400 hover:text-white text-xl border-0 bg-transparent cursor-pointer"><i class="bi bi-x-lg"></i></button>
+            </div>
+            <div class="p-5 space-y-5 max-h-[70vh] overflow-y-auto clean-scroll">
+                <div style="display: flex; gap: 16px; align-items: center;">
+                    <div class="bg-slate-950 border border-slate-800 rounded-xl overflow-hidden" style="width: 100px; height: 130px; flex-shrink: 0;">
+                        <img id="detail_foto" src="" alt="Foto Resmi" class="w-full h-full object-cover">
+                    </div>
+                    <div style="flex-grow: 1;">
+                        <div style="margin-bottom: 4px;"><span class="text-[9px] bg-indigo-600 text-white font-bold px-2 py-0.5 rounded-full uppercase tracking-wider">NO. URUT <span id="detail_nomor">0</span></span></div>
+                        <h2 id="detail_nama" class="text-lg font-black text-white leading-tight">Nama Kontestan</h2>
+                        <p id="detail_kelas_info" class="text-[10px] font-bold text-slate-400 bg-slate-950 w-max px-2.5 py-0.5 rounded mt-1.5"></p>
+                        <div class="text-xs font-semibold text-slate-300 mt-2">Suara Sementara: <span id="detail_suara" class="text-base font-black text-indigo-400 font-mono ml-0.5">0</span> Suara Sah</div>
+                    </div>
+                </div>
+                <div class="border-t border-slate-800 pt-4">
+                    <div style="margin-bottom: 14px;">
+                        <h4 class="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1.5"><i class="bi bi-eye-fill text-indigo-400"></i> Visi</h4>
+                        <p id="detail_visi" class="text-xs text-slate-200 bg-slate-950/40 p-3 border border-slate-800 rounded-xl leading-relaxed italic"></p>
+                    </div>
+                    <div>
+                        <h4 class="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1.5"><i class="bi bi-list-check text-indigo-400"></i> Misi Kerja</h4>
+                        <div id="detail_misi_container" class="text-xs text-slate-300 bg-slate-950/40 p-3 border border-slate-800 rounded-xl leading-relaxed"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+    let cachedPaslonList = []; 
+    let currentActiveTab = 'aktif';
+
+    document.addEventListener('DOMContentLoaded', () => { 
+        document.getElementById('form_tahun_pemilu').value = new Date().getFullYear(); 
+        loadPaslonData(); 
+        initAutoNumberedTextarea('form_misi'); 
+    });
+
+    function switchTab(targetTab) {
+        currentActiveTab = targetTab; 
+        const tabAktif = document.getElementById('tab_aktif'); 
+        const tabArsip = document.getElementById('tab_arsip'); 
+        const filterWrapper = document.getElementById('tahun_filter_wrapper');
+        
+        if (targetTab === 'aktif') {
+            tabAktif.className = "px-4 py-3 border-t-0 border-x-0 border-b-2 border-indigo-500 bg-transparent text-white font-bold text-sm flex items-center gap-2 transition-all cursor-pointer"; 
+            tabArsip.className = "px-4 py-3 border-t-0 border-x-0 border-b-2 border-transparent bg-transparent text-slate-400 hover:text-white font-bold text-sm flex items-center gap-2 transition-all cursor-pointer"; 
+            filterWrapper.style.display = 'none';
+        } else {
+            tabAktif.className = "px-4 py-3 border-t-0 border-x-0 border-b-2 border-transparent bg-transparent text-slate-400 hover:text-white font-bold text-sm flex items-center gap-2 transition-all cursor-pointer"; 
+            tabArsip.className = "px-4 py-3 border-t-0 border-x-0 border-b-2 border-indigo-500 bg-transparent text-white font-bold text-sm flex items-center gap-2 transition-all cursor-pointer"; 
+            filterWrapper.style.display = 'flex'; 
+            buildTahunDropdownOptions();
+        }
+        renderPaslonGrid();
+    }
+
+    async function loadPaslonData() {
+        try {
+            const response = await fetch('/api/superadmin/dashboard-stats'); 
+            const result = await response.json();
+            if (result.status === "success") {
+                cachedPaslonList = result.data.paslon_votes.map(p => { 
+                    p.is_archived = (p.is_archived === undefined || p.is_archived === null) ? 0 : parseInt(p.is_archived);
+                    if (!p.tahun_pemilu) p.tahun_pemilu = new Date().getFullYear(); 
+                    return p; 
+                });
+                if (currentActiveTab === 'arsip') buildTahunDropdownOptions();
+                renderPaslonGrid();
+            }
+        } catch (err) { 
+            console.error(err);
+            Swal.fire({ title: 'Error', text: 'Gagal memuat jalur database paslon.', icon: 'error', background: '#0f172a', confirmButtonColor: '#4f46e5' }); 
+        }
+    }
+
+    function buildTahunDropdownOptions() {
+        const selectDropdown = document.getElementById('filter_tahun_select');
+        const listTahun = [...new Set(cachedPaslonList.filter(p => p.is_archived == 1).map(p => p.tahun_pemilu))].sort((a, b) => b - a);
+        selectDropdown.innerHTML = '<option value="ALL">Semua Tahun Pemilu</option>';
+        listTahun.forEach(tahun => { 
+            const opt = document.createElement('option'); 
+            opt.value = tahun; 
+            opt.innerText = `Pemilu Tahun ${tahun}`; 
+            selectDropdown.appendChild(opt); 
+        });
+    }
+
+    function renderPaslonGrid() {
+        const container = document.getElementById('paslon_grid_container'); 
+        const targetStatusIsArchived = (currentActiveTab === 'arsip') ? 1 : 0; 
+        const filterTahunPilihan = document.getElementById('filter_tahun_select').value;
+        
+        const filteredPaslon = cachedPaslonList.filter(p => { 
+            if (p.is_archived !== targetStatusIsArchived) return false; 
+            if (targetStatusIsArchived === 1 && filterTahunPilihan !== 'ALL') { 
+                if (String(p.tahun_pemilu) !== filterTahunPilihan) return false; 
+            } 
+            return true; 
+        });
+        
+        if (filteredPaslon.length === 0) { 
+            container.innerHTML = `<div class="text-center p-8 text-slate-500 font-bold text-sm">Tidak ada data rekam kandidat paslon pada kategori ini.</div>`; 
+            return; 
+        }
+
+        container.innerHTML = filteredPaslon.map((paslon, index) => {
+            const fotoUrl = paslon.foto ? `/static/uploads/${paslon.foto}` : '/static/uploads/default.png'; 
+            const isArchived = parseInt(paslon.is_archived);
+            
+            let listMisiHtml = '';
+            const barisMisi = paslon.misi ? paslon.misi.split('\n') : [];
+            let indexMisi = 1;
+
+            barisMisi.forEach(misi => {
+                if (misi.trim() !== '') {
+                    const teksBersih = misi.trim().replace(/^\d+[\s.]?/, '').trim();
+                    listMisiHtml += `
+                        <div style="display: flex; gap: 10px; align-items: start; margin-bottom: 8px;">
+                            <span class="text-sm font-black text-indigo-400" style="min-w: 16px;">${indexMisi}</span>
+                            <p class="text-xs font-semibold text-slate-200" style="margin: 0; line-height: 1.4;">${teksBersih}</p>
+                        </div>
+                    `;
+                    indexMisi++;
+                }
+            });
+
+            if (listMisiHtml === '') {
+                listMisiHtml = `<p class="text-[11px] text-slate-500 italic">Belum ada rincian misi kerja.</p>`;
+            }
+
+            const safeVisi = paslon.visi || 'Belum mengunggah visi strategis.';
+            const archiveButton = isArchived === 1 
+                ? `<button onclick="toggleArchivePaslon(${paslon.id}, 0)" class="bg-slate-800 hover:bg-slate-700 text-white px-3 py-1 rounded-full text-[11px] font-bold border-0 cursor-pointer">Pulihkan Ke TPS</button>` 
+                : `<button onclick="toggleArchivePaslon(${paslon.id}, 1)" class="bg-amber-500/10 hover:bg-amber-500 text-amber-400 hover:text-white px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider border border-amber-500/20 cursor-pointer">Arsipkan</button>`;
+            
+            return `
+                <div class="spotify-wrapper mb-16">
+                    <div class="about-artist-box shadow-xl h-full" style="background-image: linear-gradient(rgba(0,0,0,0) 20%, rgba(2, 6, 23, 0.98) 75%), url('${fotoUrl}');">
+                        <div class="text-[10px] font-bold tracking-widest text-slate-400 uppercase">About the paslon</div>
+                        
+                        <div class="space-y-4 w-full">
+                            <div class="flex justify-between items-end gap-4">
+                                <div>
+                                    <h2 class="text-3xl font-black text-white tracking-tighter leading-none">PASLON ${paslon.nomor_urut}</h2>
+                                    <p class="text-[11px] text-indigo-400 font-bold tracking-widest mt-2 uppercase"><i class="bi bi-shield-check"></i> Surat Suara Terverifikasi</p>
+                                </div>
+                                
+                                <div class="flex flex-col items-center gap-1 bg-slate-950/60 p-2 rounded-xl border border-slate-800 shrink-0">
+                                    <span class="text-[9px] text-slate-400 font-bold tracking-widest uppercase">Action Toolkit</span>
+                                    <div class="flex items-center gap-1.5">
+                                        <button onclick="viewPaslonDetail(${paslon.id})" title="Lihat Profil" class="bg-slate-900 hover:bg-slate-800 text-slate-200 px-2 py-1 rounded-lg border-0 cursor-pointer transition-colors flex items-center justify-center"><i class="bi bi-eye text-sm text-indigo-400"></i></button>
+                                        <button onclick="openEditPaslonModal(${paslon.id})" title="Ubah Data" class="bg-slate-900 hover:bg-indigo-600 text-white px-2 py-1 rounded-lg border-0 cursor-pointer transition-colors flex items-center justify-center"><i class="bi bi-pencil-square text-sm text-indigo-400"></i></button>
+                                        <button onclick="deletePaslonPermanen(${paslon.id}, '${paslon.nama_ketua}')" title="Hapus Permanen" class="bg-red-500/10 hover:bg-red-600 text-red-400 hover:text-white px-2 py-1 rounded-lg border-0 cursor-pointer transition-colors flex items-center justify-center"><i class="bi bi-trash3-fill text-xs"></i></button>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="pt-4 border-t border-slate-800 space-y-2.5 text-sm">
+                                <div class="grid grid-cols-12 gap-2 items-center bg-slate-950/60 p-2.5 rounded-xl border border-slate-800">
+                                    <div class="col-span-3 text-slate-400 font-bold tracking-wide text-[10px] uppercase">Calon Ketua</div>
+                                    <div class="col-span-6 text-white font-extrabold text-sm tracking-tight truncate">${paslon.nama_ketua}</div>
+                                    <div class="col-span-3 text-right text-xs font-mono font-bold text-indigo-400 bg-indigo-500/10 px-2 py-0.5 rounded border border-indigo-500/20">${paslon.kelas_ketua || '-'}</div>
+                                </div>
+                                <div class="grid grid-cols-12 gap-2 items-center bg-slate-950/60 p-2.5 rounded-xl border border-slate-800">
+                                    <div class="col-span-3 text-slate-400 font-bold tracking-wide text-[10px] uppercase">Calon Wakil</div>
+                                    <div class="col-span-6 text-slate-200 font-bold text-sm tracking-tight truncate">${paslon.nama_wakil}</div>
+                                    <div class="col-span-3 text-right text-xs font-mono font-bold text-violet-400 bg-violet-500/10 px-2 py-0.5 rounded border border-violet-500/20">${paslon.kelas_wakil || '-'}</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="flex flex-col gap-4 h-full justify-between">
+                        <div class="flex flex-col justify-between spotify-panel-dark">
+                            <div class="flex justify-between items-center mb-4 shrink-0">
+                                <span class="text-xs font-bold text-indigo-400 tracking-widest uppercase flex items-center gap-1.5">
+                                    <i class="bi bi-eye-fill"></i> Visi Utama
+                                </span>
+                                <div class="flex items-center gap-2">
+                                    <span class="text-xs font-bold text-slate-400 tracking-wide">Suara: <span class="text-sm font-black text-white font-mono bg-indigo-600/20 px-2 py-0.5 rounded-lg ml-0.5 border border-indigo-500/20">${paslon.total_suara}</span></span>
+                                    ${archiveButton}
+                                </div>
+                            </div>
+                            
+                            <div class="py-2">
+                                <p class="text-sm lg:text-base font-bold text-slate-100 leading-relaxed tracking-wide italic">
+                                    "${safeVisi}"
+                                </p>
+                            </div>
+                            <div class="text-[10px] text-slate-500 font-bold tracking-wider uppercase mt-4 shrink-0">Formulir Pokok Kebijakan Visi</div>
+                        </div>
+
+                        <div class="spotify-panel-dark flex flex-col justify-between h-[220px]">
+                            <div class="flex justify-between items-center mb-3 shrink-0">
+                                <span class="text-xs font-bold text-violet-400 tracking-widest uppercase flex items-center gap-1.5">
+                                    <i class="bi bi-list-check"></i> Misi Kerja & Program Utama
+                                </span>
+                                <span class="text-[11px] font-medium text-slate-400 tracking-wide">Open queue</span>
+                            </div>
+                            
+                            <div class="overflow-y-auto clean-scroll space-y-3 flex-1 pr-1 max-h-[150px]">
+                                ${listMisiHtml}
+                            </div>
+                        </div>
+                    </div>
+                </div>`;
+        }).join('');
+    }
+
+    async function toggleArchivePaslon(id, archiveVal) {
+        try {
+            const response = await fetch(`/api/superadmin/paslon/toggle-archive/${id}`, { 
+                method: 'POST', 
+                headers: { 'Content-Type': 'application/json' }, 
+                body: JSON.stringify({ is_archived: archiveVal }) 
+            });
+            if (response.ok) { 
+                Swal.fire({ title: 'Sukses!', text: 'Status kearsipan kontestan berhasil disesuaikan.', icon: 'success', background: '#0f172a', confirmButtonColor: '#4f46e5' }); 
+                loadPaslonData(); 
+            }
+        } catch { 
+            Swal.fire({ title: 'Error', text: 'Gagal memproses kearsipan.', icon: 'error', background: '#0f172a', confirmButtonColor: '#4f46e5' }); 
+        }
+    }
+
+    async function deletePaslonPermanen(id, name) {
+        Swal.fire({ 
+            title: 'Hapus Paslon Permanen?', 
+            text: `Tindakan ini menghapus mutlak kandidat "${name}" secara fisik dari database!`, 
+            icon: 'warning', 
+            background: '#0f172a',
+            color: '#ffffff',
+            showCancelButton: true, 
+            confirmButtonColor: '#ef4444',
+            cancelButtonColor: '#334155',
+            confirmButtonText: 'Ya, Hapus Mutlak!',
+            cancelButtonText: 'Batal'
+        }).then(async (result) => {
+            if (result.isConfirmed) {
+                try {
+                    const response = await fetch(`/api/superadmin/paslon/delete/${id}`, { method: 'DELETE' }); 
+                    if (response.ok) { 
+                        Swal.fire({ title: 'Terhapus!', text: 'Kandidat dicopot selamanya.', icon: 'success', background: '#0f172a', confirmButtonColor: '#4f46e5' }); 
+                        loadPaslonData(); 
+                    }
+                } catch { 
+                    Swal.fire({ title: 'Error', text: 'Gagal menghubungi server database.', icon: 'error', background: '#0f172a', confirmButtonColor: '#4f46e5' }); 
+                }
+            }
+        });
+    }
+
+    function initAutoNumberedTextarea(id) {
+        const el = document.getElementById(id); 
+        if(!el) return;
+        el.addEventListener('focus', () => { if (el.value.trim() === "") el.value = "1. "; });
+        el.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter') {
+                e.preventDefault(); 
+                const text = el.value; 
+                const selectionStart = el.selectionStart;
+                const lines = text.substring(0, selectionStart).split('\n'); 
+                const textSisipan = `\n${lines.length + 1}. `;
+                el.value = text.substring(0, selectionStart) + textSisipan + text.substring(selectionStart); 
+                el.selectionStart = el.selectionEnd = selectionStart + textSisipan.length;
+            }
+        });
+    }
+
+    function convertMisiToHtmlList(misiText) { 
+        if (!misiText || misiText.trim() === "") return '-'; 
+        const lines = misiText.split('\n').map(line => line.trim()).filter(line => line.length > 0); 
+        return `<ol class="list-decimal pl-4 space-y-1 text-xs text-slate-300">${lines.map(line => `<li>${line.replace(/^\d+[\s.]?/, '').trim()}</li>`).join('')}</ol>`; 
+    }
+
+    function viewPaslonDetail(id) {
+        const paslon = cachedPaslonList.find(p => p.id === id); 
+        if (!paslon) return;
+        
+        document.getElementById('detail_foto').src = paslon.foto ? `/static/uploads/${paslon.foto}` : '/static/uploads/default.png'; 
+        document.getElementById('detail_nomor').innerText = paslon.nomor_urut;
+        document.getElementById('detail_nama').innerHTML = `${paslon.nama_ketua} & ${paslon.nama_wakil}`; 
+        document.getElementById('detail_kelas_info').innerText = `Kelas Ketua: ${paslon.kelas_ketua || '-'} | Wakil: ${paslon.kelas_wakil || '-'}`;
+        document.getElementById('detail_suara').innerText = paslon.total_suara; 
+        document.getElementById('detail_visi').innerText = paslon.visi || '-';
+        
+        document.getElementById('detail_misi_container').innerHTML = convertMisiToHtmlList(paslon.misi); 
+        document.getElementById('detail_paslon_modal').classList.remove('hidden');
+    }
+
+    function openEditPaslonModal(id) {
+        const paslon = cachedPaslonList.find(p => p.id === id);
+        if (!paslon) return;
+
+        document.getElementById('modal_title').innerText = "Form Ubah Data Paslon";
+        document.getElementById('submit_btn').innerText = "Simpan Perubahan";
+        document.getElementById('form_id').value = paslon.id;
+        document.getElementById('form_nomor_urut').value = paslon.nomor_urut;
+        document.getElementById('form_tahun_pemilu').value = paslon.tahun_pemilu;
+        document.getElementById('form_nama_ketua').value = paslon.nama_ketua;
+        document.getElementById('form_kelas_ketua').value = paslon.kelas_ketua || '';
+        document.getElementById('form_nama_wakil').value = paslon.nama_wakil;
+        document.getElementById('form_kelas_wakil').value = paslon.kelas_wakil || '';
+        document.getElementById('form_visi').value = paslon.visi || '';
+        document.getElementById('form_misi').value = paslon.misi || '';
+        
+        // PENTING: Jangan paksa upload foto saat edit dilakukan
+        document.getElementById('form_foto').required = false; 
+        document.getElementById('paslon_modal').classList.remove('hidden');
+    }
+
+    // ==========================================================================
+    // PERBAIKAN UTAMA PADA BLOK PENGIRIMAN DATA FORM (SUBMIT ENGINE)
+    // ==========================================================================
+    async function submitPaslonForm(e) {
+        e.preventDefault(); 
+        const formData = new FormData();
+        const idVal = document.getElementById('form_id').value;
+        
+        formData.append('nomor_urut', document.getElementById('form_nomor_urut').value); 
+        formData.append('tahun_pemilu', document.getElementById('form_tahun_pemilu').value);
+        formData.append('nama_ketua', document.getElementById('form_nama_ketua').value); 
+        formData.append('nama_wakil', document.getElementById('form_nama_wakil').value);
+        formData.append('kelas_ketua', document.getElementById('form_kelas_ketua').value); 
+        formData.append('kelas_wakil', document.getElementById('form_kelas_wakil').value);
+        formData.append('visi', document.getElementById('form_visi').value); 
+        formData.append('misi', document.getElementById('form_misi').value);
+        
+        const fotoInput = document.getElementById('form_foto');
+        // Hanya kirim file foto jika pengguna memang memilih berkas baru
+        if (fotoInput.files.length > 0) {
+            formData.append('foto', fotoInput.files[0]);
+        }
+        
+        const url = idVal ? `/api/superadmin/paslon/update/${idVal}` : '/api/superadmin/paslon';
+        
+        // Disable tombol agar user tidak melakukan klik ganda
+        const submitBtn = document.getElementById('submit_btn');
+        const originalText = submitBtn.innerText;
+        submitBtn.disabled = true;
+        submitBtn.innerText = "Memproses Jaringan...";
+
+        try {
+            const response = await fetch(url, { 
+                method: 'POST', 
+                body: formData // JANGAN pasang Header Content-Type manual agar boundary FormData tidak rusak
+            });
+            
+            const result = await response.json();
+
+            if (response.ok && result.status === "success") { 
+                Swal.fire({ title: 'Sukses!', text: result.message || 'Data kandidat berhasil disimpan.', icon: 'success', background: '#0f172a', confirmButtonColor: '#4f46e5' }); 
+                closePaslonModal(); 
+                loadPaslonData(); 
+            } else {
+                Swal.fire({ title: 'Gagal', text: result.message || 'Terjadi kesalahan sistem internal.', icon: 'error', background: '#0f172a', confirmButtonColor: '#4f46e5' });
+            }
+        } catch (err) { 
+            console.error("Kesalahan transmisi:", err);
+            Swal.fire({ title: 'Error', text: 'Kendala transmisi data ke server gateway.', icon: 'error', background: '#0f172a', confirmButtonColor: '#4f46e5' }); 
+        } finally {
+            submitBtn.disabled = false;
+            submitBtn.innerText = originalText;
+        }
+    }
+
+    function openPaslonModal() { 
+        document.getElementById('modal_title').innerText = "Form Registrasi Paslon";
+        document.getElementById('submit_btn').innerText = "Daftarkan Paslon";
+        document.getElementById('form_id').value = "";
+        document.getElementById('paslon_form').reset(); 
+        document.getElementById('form_tahun_pemilu').value = new Date().getFullYear(); 
+        document.getElementById('form_foto').required = true; // Wajib upload foto saat pendaftaran baru
+        document.getElementById('paslon_modal').classList.remove('hidden'); 
+    }
+    
+    function closePaslonModal() { document.getElementById('paslon_modal').classList.add('hidden'); }
+    function closeDetailPaslonModal() { document.getElementById('detail_paslon_modal').classList.add('hidden'); }
+    function handleLogout() { fetch('/api/logout', { method: 'POST' }).then(() => location.href = '/auth/login'); }
+</script>
+</body>
+</html>

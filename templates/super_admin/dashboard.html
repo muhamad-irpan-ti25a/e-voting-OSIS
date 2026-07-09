@@ -1,0 +1,663 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Super Admin - Dashboard Live OSIS</title>
+    <link rel="stylesheet" href="/static/css/style.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700;800;900&family=JetBrains+Mono:wght@800&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <style>
+        body { font-family: 'Inter', sans-serif; }
+        .font-mono-kpu { font-family: 'JetBrains Mono', monospace; }
+        
+        .clean-scroll::-webkit-scrollbar { 
+            width: 6px; 
+        }
+        .clean-scroll::-webkit-scrollbar-track {
+            background: transparent;
+        }
+        .clean-scroll::-webkit-scrollbar-thumb { 
+            background: #1e293b; 
+            border-radius: 10px; 
+        }
+    </style>
+</head>
+<body class="bg-slate-950 text-slate-100 min-h-screen flex">
+
+    <!-- PANEL NAVIGASI KIRI (SIDEBAR MASTER) -->
+    <aside class="w-64 bg-slate-900/70 backdrop-blur-xl border-r border-slate-800 flex flex-col justify-between sticky top-0 h-screen z-50 flex-shrink-0">
+        <div class="p-5">
+            <div class="flex items-center gap-3 pb-5 border-b border-slate-800">
+                <div class="bg-indigo-600 p-2 rounded-lg text-white shadow-lg flex items-center justify-center">
+                    <i class="bi bi-shield-check text-2xl"></i>
+                </div>
+                <div>
+                    <h2 class="font-black text-xl tracking-tight text-white leading-none">E-Vote OSIS</h2>
+                    <span class="text-[10px] bg-indigo-500/20 text-indigo-300 px-2.5 py-0.5 rounded-full font-black tracking-wider block mt-1 w-max">SUPER ADMIN</span>
+                </div>
+            </div>
+            <nav class="mt-8 space-y-2">
+                <a href="/superadmin/dashboard" class="flex items-center gap-3 px-3.5 py-3 bg-indigo-600 text-white rounded-xl font-black shadow-lg shadow-indigo-600/20 transition-all">
+                    <i class="bi bi-grid-1x2 text-xl"></i> <span class="text-base tracking-wide">Dashboard Live</span>
+                </a>
+                <a href="/superadmin/manajemen-admin" class="flex items-center gap-3 px-3.5 py-3 text-slate-400 hover:text-white hover:bg-slate-900/60 rounded-xl font-bold transition-colors">
+                    <i class="bi bi-people text-xl text-slate-500"></i> <span class="text-base tracking-wide">Panitia Admin</span>
+                </a>
+                <a href="/superadmin/manajemen-paslon" class="flex items-center gap-3 px-3.5 py-3 text-slate-400 hover:text-white hover:bg-slate-900/60 rounded-xl font-bold transition-colors">
+                    <i class="bi bi-person-vcard text-xl text-slate-500"></i> <span class="text-base tracking-wide">Kandidat Paslon</span>
+                </a>
+                <a href="/superadmin/data-pemilih" class="flex items-center gap-3 px-3.5 py-3 text-slate-400 hover:text-white hover:bg-slate-900/60 rounded-xl font-bold transition-colors">
+                    <i class="bi bi-person-lines-fill text-xl text-slate-500"></i> <span class="text-base tracking-wide">Master DPT</span>
+                </a>
+                <a href="/superadmin/quick-count" class="flex items-center gap-3 px-3.5 py-3 text-slate-400 hover:text-white hover:bg-slate-900/60 rounded-xl font-bold transition-colors">
+                    <i class="bi bi-pie-chart text-xl text-slate-500"></i> <span class="text-base tracking-wide">Quick Count Live</span>
+                </a>
+                <a href="/superadmin/log-aktivitas" class="flex items-center gap-3 px-3.5 py-3 text-slate-400 hover:text-white hover:bg-slate-900/60 rounded-xl font-bold transition-colors">
+                    <i class="bi bi-journal-text text-xl text-slate-500"></i> <span class="text-base tracking-wide">Log Audit Sistem</span>
+                </a>
+            </nav>
+        </div>
+        <div class="p-4 border-t border-slate-800 bg-slate-950/40">
+            <div class="flex items-center gap-3 mb-4 px-1">
+                <div class="w-10 h-10 rounded-full bg-slate-800 flex items-center justify-center border-2 border-slate-700 shadow-inner flex-shrink-0">
+                    <i class="bi bi-person-fill text-slate-200 text-xl"></i>
+                </div>
+                <div class="truncate flex-1">
+                    <h4 class="text-base font-black text-white truncate leading-tight">Super Admin</h4>
+                    <span class="text-xs text-emerald-400 block font-black mt-0.5">● Online</span>
+                </div>
+            </div>
+            <button onclick="handleLogout()" class="w-full flex items-center justify-center gap-2 px-3 py-3 bg-red-500/10 hover:bg-red-500 text-red-400 hover:text-white rounded-xl text-sm font-black border-2 border-red-500/10 hover:border-transparent transition-all shadow-md">
+                <i class="bi bi-box-arrow-left text-lg"></i> Keluar Sistem
+            </button>
+        </div>
+    </aside>
+
+    <!-- AREA MONITOR UTAMA (MAIN VIEW) -->
+    <main class="flex-1 p-8 lg:p-12 space-y-10 overflow-y-auto max-w-[calc(100vw-16rem)] bg-slate-950">
+        <header class="flex flex-col gap-4 pb-6 border-b border-slate-800">
+            <div>
+                <h1 class="text-5xl font-black text-white tracking-tight">Real-time Vote Monitor</h1>
+                <p class="text-slate-400 text-lg mt-1 font-medium">Pantau pergerakan hak suara masuk dari bilik TPS secara langsung.</p>
+            </div>
+            
+            <div class="flex flex-wrap items-center gap-3 w-full mt-2">
+                <div class="flex items-center gap-2.5 bg-slate-900/60 px-3.5 py-2.5 border border-slate-800 rounded-xl shadow-md min-w-[180px]">
+                    <label for="filter_tahun_select" class="text-slate-400 font-bold text-xs whitespace-nowrap">
+                        <i class="bi bi-funnel-fill text-indigo-500"></i> Periode:
+                    </label>
+                    <select id="filter_tahun_select" onchange="syncDashboard()" class="w-full bg-slate-950 border border-slate-800/80 rounded-lg px-2 py-1 text-white font-black text-xs focus:outline-none focus:border-indigo-500 cursor-pointer">
+                        <!-- Diisi otomatis via JavaScript -->
+                    </select>
+                </div>
+                
+                <div class="flex items-center gap-2 bg-emerald-500/10 text-emerald-400 px-4 py-2.5 rounded-xl border border-emerald-500/20 text-xs font-black tracking-wide shadow-md h-[38px]">
+                    <span class="w-2 h-2 bg-emerald-400 rounded-full animate-pulse"></span> Live Sync Active
+                </div>
+
+                <button id="btn_toggle_pemilu" onclick="ubahStatusPemilu()" class="bg-amber-500/10 hover:bg-amber-500/20 text-white px-4 py-2.5 rounded-xl text-xs font-black border border-amber-500/30 shadow-md cursor-pointer transition-all flex items-center gap-1.5 h-[38px]">
+                    <i class="bi bi-toggle-off text-sm"></i> Memuat Status Saklar...
+                </button>
+
+                <button onclick="triggerLockSnapshot()" class="bg-indigo-600 hover:bg-indigo-500 text-white px-4 py-2.5 rounded-xl text-xs font-black border-0 shadow-md shadow-indigo-600/10 cursor-pointer transition-all flex items-center gap-1.5 h-[38px]">
+                    <i class="bi bi-lock-fill text-sm"></i> Kunci & Arsipkan Pemilu
+                </button>
+                
+                <button onclick="triggerEmergencyReset()" class="bg-red-500/10 hover:bg-red-600 text-red-400 hover:text-white px-4 py-2.5 rounded-xl text-xs font-black border border-red-500/20 hover:border-transparent transition-all shadow-md cursor-pointer flex items-center gap-1.5 h-[38px] lg:ml-auto">
+                    <i class="bi bi-exclamation-triangle-fill text-sm"></i> Darurat Reset Total
+                </button>
+            </div>
+        </header>
+
+        <!-- KARTU STATUS RINGKASAN DATA (STATS GRID COMPONENT) -->
+        <section class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+            <div class="bg-slate-900/40 border border-slate-800 p-5 rounded-2xl shadow-xl flex flex-col justify-between">
+                <div class="flex justify-between items-start">
+                    <div>
+                        <span class="text-xs text-slate-400 font-bold uppercase tracking-wider block">Total DPT Terdaftar</span>
+                        <h3 id="stat_total_pemilih" class="text-3xl font-black text-white mt-2 font-mono-kpu leading-none">0</h3>
+                    </div>
+                    <div class="bg-slate-800 text-indigo-400 p-2.5 rounded-xl flex items-center justify-center">
+                        <i class="bi bi-people-fill text-xl"></i>
+                    </div>
+                </div>
+                <div class="mt-4 flex gap-4 text-xs font-bold text-slate-300 border-t border-slate-800/80 pt-3">
+                    <span class="w-max">Siswa: <strong id="stat_siswa" class="text-indigo-400 font-mono-kpu text-sm ml-0.5">0</strong></span>
+                    <span class="w-max">Guru: <strong id="stat_guru" class="text-indigo-400 font-mono-kpu text-sm ml-0.5">0</strong></span>
+                </div>
+            </div>
+
+            <div class="bg-slate-900/40 border border-slate-800 p-5 rounded-2xl shadow-xl flex flex-col justify-between">
+                <div class="flex justify-between items-start">
+                    <div>
+                        <span class="text-xs text-slate-400 font-bold uppercase tracking-wider block">Total Suara Masuk</span>
+                        <h3 id="stat_sudah_memilih" class="text-3xl font-black text-emerald-400 mt-2 font-mono-kpu leading-none">0</h3>
+                    </div>
+                    <div class="bg-emerald-500/10 text-emerald-400 p-2.5 rounded-xl border border-emerald-500/20 flex items-center justify-center">
+                        <i class="bi bi-envelope-check-fill text-xl"></i>
+                    </div>
+                </div>
+                <p class="text-xs text-slate-400 font-medium mt-4 border-t border-slate-800/80 pt-3 flex items-center gap-1.5">
+                    <i class="bi bi-shield-check text-emerald-400 text-base"></i> Terverifikasi sistem.
+                </p>
+            </div>
+
+            <div class="bg-slate-900/40 border border-slate-800 p-5 rounded-2xl shadow-xl flex flex-col justify-between">
+                <div class="flex justify-between items-start">
+                    <div>
+                        <span class="text-xs text-slate-400 font-bold uppercase tracking-wider block">Belum Memilih</span>
+                        <h3 id="stat_belum_memilih" class="text-3xl font-black text-amber-500 mt-2 font-mono-kpu leading-none">0</h3>
+                    </div>
+                    <div class="bg-amber-500/10 text-amber-500 p-2.5 rounded-xl border border-amber-500/20 flex items-center justify-center">
+                        <i class="bi bi-hourglass-split text-xl"></i>
+                    </div>
+                </div>
+                <p class="text-xs text-slate-400 font-medium mt-4 border-t border-slate-800/80 pt-3 flex items-center gap-1.5">
+                    <i class="bi bi-info-circle text-amber-400 text-base"></i> Antrean tunggu TPS.
+                </p>
+            </div>
+
+            <div class="bg-indigo-950/20 border border-indigo-500/20 p-5 rounded-2xl shadow-xl flex flex-col justify-between">
+                <div class="flex justify-between items-start">
+                    <div>
+                        <span class="text-xs text-slate-400 font-bold uppercase tracking-wider block">Tingkat Partisipasi</span>
+                        <h3 id="stat_partisipasi_persen" class="text-3xl font-black text-indigo-400 mt-2 font-mono-kpu leading-none">0.00%</h3>
+                    </div>
+                    <div class="bg-indigo-600/20 text-indigo-400 p-2.5 rounded-xl border border-indigo-500/20 flex items-center justify-center">
+                        <i class="bi bi-pie-chart-fill text-xl"></i>
+                    </div>
+                </div>
+                <div class="w-full bg-slate-800 h-2 rounded-full mt-5 overflow-hidden">
+                    <div id="stat_progress_bar" class="bg-indigo-500 h-full transition-all duration-1000" style="width: 0%;"></div>
+                </div>
+            </div>
+        </section>
+
+        <!-- KELOMPOK GRAFIK, PAPAN SKOR, DAN KOMPONEN INTERAKTIF AI -->
+        <section class="grid grid-cols-1 lg:grid-cols-5 gap-6 items-start">
+            
+            <!-- BLOK KIRI (3 KOLOM): GRAFIK DISTRIBUSI UTAMA -->
+            <div class="lg:col-span-3 bg-slate-900/30 border border-slate-800 rounded-2xl p-5 flex flex-col justify-between shadow-xl min-h-[520px]">
+                <div class="flex justify-between items-start mb-4">
+                    <div>
+                        <h3 class="text-sm font-bold text-white tracking-tight uppercase border-l-4 border-indigo-500 pl-2">Distribusi Suara</h3>
+                        <p class="text-xs text-slate-400 mt-0.5 font-medium">Komparasi grafik perolehan live paslon.</p>
+                    </div>
+                    <span class="text-[10px] bg-slate-800 text-slate-400 px-2 py-1 rounded font-mono font-bold border border-slate-700">Chart.js</span>
+                </div>
+                <div class="relative h-80 w-full mt-2">
+                    <canvas id="liveVoteChart"></canvas>
+                </div>
+            </div>
+
+            <!-- BLOK KANAN (2 KOLOM): COMBINED SCOREBOARD & SIREKAP AI WORKSPACE -->
+            <div class="lg:col-span-2 flex flex-col gap-6 min-h-[520px]">
+                
+                <!-- SUB-BLOK ATAS: REKAPITULASI VERTIKAL PAPAN SKOR -->
+                <div class="bg-slate-900/30 border border-slate-800 rounded-2xl p-5 shadow-xl flex flex-col justify-between">
+                    <div class="flex justify-between items-start mb-4">
+                        <div>
+                            <h3 class="text-sm font-bold text-white tracking-tight uppercase border-l-4 border-amber-500 pl-2">Papan Skor Paslon</h3>
+                            <p class="text-xs text-slate-400 mt-0.5 font-medium">Perolehan suara kandidat secara real-time.</p>
+                        </div>
+                        <span class="text-[10px] bg-amber-500/10 text-amber-400 px-2 py-1 rounded font-mono font-bold border border-amber-500/20">LIVE SCORE</span>
+                    </div>
+                    <div id="paslon_cards_score" class="space-y-3 overflow-y-auto clean-scroll pr-1 max-h-[130px] min-h-[110px]">
+                        <div class="text-center py-4 text-xs text-slate-500 font-bold">Memuat skor...</div>
+                    </div>
+                </div>
+
+                <!-- SUB-BLOK BAWAH: SIREKAP AI CORE ENGINE WORKSPACE -->
+                <div class="bg-slate-900/40 border border-indigo-500/10 rounded-2xl p-5 flex flex-col shadow-xl flex-1 justify-between relative overflow-hidden backdrop-blur-md min-h-[300px]">
+                    <div class="flex items-center justify-between border-b border-slate-800/80 pb-3 mb-3">
+                        <div class="flex items-center gap-3">
+                            <div class="w-7 h-7 rounded-lg bg-indigo-600/10 border border-indigo-500/20 flex items-center justify-center text-indigo-400 text-xs animate-pulse">
+                                🤖
+                            </div>
+                            <div>
+                                <h3 class="text-xs font-bold text-white tracking-tight uppercase">Sirekap AI Engine</h3>
+                                <span class="text-[9px] text-emerald-400 font-bold tracking-wider block">● KPU GROUNDING READY</span>
+                            </div>
+                        </div>
+                        <span class="text-[8px] bg-indigo-500/10 text-indigo-400 px-1.5 py-0.5 rounded font-black tracking-widest font-mono">V1.5-FLASH</span>
+                    </div>
+
+                    <div id="ai-agent-messages" class="flex-1 overflow-y-auto clean-scroll space-y-3 pr-1 text-[11px] mb-3 flex flex-col p-3 bg-slate-950/40 rounded-xl border border-slate-900/80 max-h-[160px] min-h-[140px]">
+                        <div class="bg-indigo-600/10 border border-indigo-500/20 p-2.5 rounded-xl line-height-1.5 text-slate-200 self-start max-w-[90%] shadow-sm">
+                            Halo Rekan Panitia **Super Admin**! 👋 Saya adalah **Sirekap AI Agent** yang terhubung langsung dengan basis data MySQL. Ada yang bisa saya bantu analisis mengenai tren partisipasi atau perolehan suara hari ini?
+                        </div>
+                    </div>
+
+                    <form onsubmit="sendAiMessage(event)" class="flex gap-2 bg-slate-950 p-1 border border-slate-800 rounded-xl shadow-inner mt-auto">
+                        <input type="text" id="ai-agent-input" placeholder="Tanyakan tren partisipasi atau hasil..." autocomplete="off" 
+                               class="flex-1 bg-transparent border-0 px-3 py-1.5 text-white text-[11px] outline-none focus:ring-0 placeholder-slate-500">
+                        <button type="submit" class="bg-indigo-600 hover:bg-indigo-500 text-white px-3 py-1.5 rounded-lg font-bold text-[11px] cursor-pointer transition-all shadow-md shadow-indigo-600/20 flex items-center justify-center gap-1">
+                            Kirim <i class="bi bi-send-fill text-[9px]"></i>
+                        </button>
+                    </form>
+                </div>
+
+            </div>
+        </section>
+    </main>
+
+    <!-- CORE LOGIKA TRANSMISI DATA ENGINE -->
+    <script>
+    let voteChartInstance = null;
+    const chartColors = ['#4f46e5', '#f59e0b', '#10b981', '#ec4899', '#06b6d4', '#8b5cf6'];
+
+    document.addEventListener('DOMContentLoaded', () => {
+        initLiveVoteChart();
+        syncDashboard();
+        setInterval(syncDashboard, 4000); 
+    });
+
+    function initLiveVoteChart() {
+        const ctx = document.getElementById('liveVoteChart').getContext('2d');
+        voteChartInstance = new Chart(ctx, {
+            type: 'bar',
+            data: {
+                labels: [],
+                datasets: [{
+                    data: [],
+                    backgroundColor: 'rgba(79, 70, 229, 0.6)',
+                    borderColor: 'rgba(99, 102, 241, 1)',
+                    borderWidth: 2,
+                    borderRadius: 8
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: { legend: { display: false } },
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        grid: { color: 'rgba(51, 65, 85, 0.15)' },
+                        ticks: { color: '#94a3b8', font: { weight: 'bold', size: 11 } }
+                    },
+                    x: {
+                        grid: { display: false },
+                        ticks: { color: '#e2e8f0', font: { weight: '800', size: 12 } }
+                    }
+                }
+            }
+        });
+    }
+
+    async function syncDashboard() {
+        try {
+            const filterTahunEl = document.getElementById('filter_tahun_select');
+            let tahunDipilih = filterTahunEl && filterTahunEl.value ? filterTahunEl.value : new Date().getFullYear();
+            
+            let tahunKueri = tahunDipilih.toString().replace('_archive', '');
+            let modeKueri = tahunDipilih.toString().includes('_archive') ? 'archive' : 'live';
+            
+            const response = await fetch(`/api/superadmin/dashboard-stats?tahun=${tahunKueri}&mode=${modeKueri}`);
+            if (!response.ok) return;
+            const result = await response.json();
+
+            if (result.status === "success") {
+                const summary = result.data.summary;
+                const paslonListAll = result.data.paslon_votes || [];
+
+                // ======================================================================
+                // SYNC SAKLAR PEMILU REAL-TIME VARIABEL GLOBAL MEMORI FLASK
+                // ======================================================================
+                const btnToggle = document.getElementById('btn_toggle_pemilu');
+                if (btnToggle && result.data.status_pemilu_sekarang) {
+                    const statusGerbang = result.data.status_pemilu_sekarang;
+                    if (statusGerbang === 'dimulai') {
+                        btnToggle.innerHTML = `<i class="bi bi-toggle-on text-emerald-400 text-sm"></i> Pemilihan: <span class="text-emerald-400 font-extrabold">TERBUKA</span>`;
+                        btnToggle.className = "bg-emerald-500/10 hover:bg-emerald-500/20 text-white px-4 py-2.5 rounded-xl text-xs font-black border border-emerald-500/30 shadow-md cursor-pointer transition-all flex items-center gap-1.5 h-[38px]";
+                        btnToggle.setAttribute('data-current', 'dimulai');
+                    } else {
+                        btnToggle.innerHTML = `<i class="bi bi-toggle-off text-amber-500 text-sm"></i> Pemilihan: <span class="text-amber-500 font-extrabold">TERTUTUP</span>`;
+                        btnToggle.className = "bg-amber-500/10 hover:bg-amber-500/20 text-white px-4 py-2.5 rounded-xl text-xs font-black border border-amber-500/30 shadow-md cursor-pointer transition-all flex items-center gap-1.5 h-[38px]";
+                        btnToggle.setAttribute('data-current', 'belum_dimulai');
+                    }
+                }
+                
+                if (filterTahunEl && filterTahunEl.options.length === 0) {
+                    let daftarTahunSnapshot = result.data.daftar_tahun || [];
+                    const tahunSekarang = new Date().getFullYear();
+                    
+                    let tahunArsipLama = daftarTahunSnapshot.filter(th => parseInt(th) !== tahunSekarang);
+                    tahunArsipLama.sort((a, b) => b - a);
+
+                    let penampungOption = '';
+                    penampungOption += `<option value="${tahunSekarang}" ${tahunDipilih == tahunSekarang ? 'selected' : ''}>Pemilu Tahun ${tahunSekarang} (Aktif)</option>`;
+
+                    if (daftarTahunSnapshot.includes(tahunSekarang) || daftarTahunSnapshot.includes(String(tahunSekarang))) {
+                        penampungOption += `<option value="${tahunSekarang}_archive" ${tahunDipilih == (tahunSekarang + '_archive') ? 'selected' : ''}>Pemilu Tahun ${tahunSekarang} (Arsip)</option>`;
+                    }
+
+                    tahunArsipLama.forEach(th => {
+                        penampungOption += `<option value="${th}" ${tahunDipilih == th ? 'selected' : ''}>Pemilu Tahun ${th} (Arsip)</option>`;
+                    });
+
+                    filterTahunEl.innerHTML = penampungOption;
+                    tahunDipilih = filterTahunEl.value;
+                }
+
+                let tahunFilter = tahunDipilih.toString().replace('_archive', '');
+                let paslonList = paslonListAll.filter(p => String(p.tahun_pemilu) === String(tahunFilter));
+
+                const totalPemilih = summary.total_pemilih || 0;
+                const totalSiswa = summary.total_siswa || 0;
+                const totalGuru = summary.total_guru || 0;
+                const sudahMemilih = summary.sudah_memilih || 0;
+                const belumMemilih = summary.belum_memilih || 0;
+                const percent = summary.partisipasi_percent || 0;
+
+                document.getElementById('stat_total_pemilih').innerText = totalPemilih;
+                document.getElementById('stat_siswa').innerText = totalSiswa;
+                document.getElementById('stat_guru').innerText = totalGuru;
+                document.getElementById('stat_sudah_memilih').innerText = sudahMemilih;
+                document.getElementById('stat_belum_memilih').innerText = belumMemilih;
+                document.getElementById('stat_partisipasi_persen').innerText = parseFloat(percent).toFixed(2) + '%';
+                document.getElementById('stat_progress_bar').style.width = percent + '%';
+
+                if (voteChartInstance) {
+                    if (paslonList.length === 0 && sudahMemilih > 0) {
+                        voteChartInstance.data.labels = [`Rekaman Total Suara Sah (${tahunFilter})`];
+                        voteChartInstance.data.datasets[0].data = [sudahMemilih];
+                    } else {
+                        voteChartInstance.data.labels = paslonList.map(p => `Paslon ${p.nomor_urut}`);
+                        voteChartInstance.data.datasets[0].data = paslonList.map(p => p.total_suara || 0);
+                    }
+                    voteChartInstance.update();
+                }
+
+                const containerRightScore = document.getElementById('paslon_cards_score');
+
+                if (paslonList.length > 0) {
+                    const cardHtmlString = paslonList.map(paslon => `
+                        <div style="display: flex; align-items: center; justify-content: space-between; background: rgba(2, 6, 23, 0.5); border: 1px solid #1e293b; padding: 10px 16px; border-radius: 12px; gap: 12px;">
+                            <div style="display: flex; align-items: center; gap: 12px;">
+                                <div class="w-8 h-8 bg-indigo-600/20 text-indigo-400 font-black flex items-center justify-center rounded-lg text-xs border border-indigo-500/20 font-mono-kpu flex-shrink-0">
+                                    ${paslon.nomor_urut}
+                                </div>
+                                <div style="min-width: 0;">
+                                    <h4 style="margin: 0; font-size: 13px; font-weight: 800; color: #ffffff; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">${paslon.nama_ketua}</h4>
+                                    <p style="margin: 1px 0 0 0; font-size: 10px; font-weight: 600; color: #94a3b8; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">& ${paslon.nama_wakil}</p>
+                                </div>
+                            </div>
+                            <div style="text-align: right; flex-shrink: 0;">
+                                <span class="font-mono-kpu text-emerald-400" style="font-size: 16px; font-weight: 900; display: block; line-height: 1;">${paslon.total_suara || 0}</span>
+                                <span style="margin-top: 2px; font-size: 8px; font-weight: 800; color: #515f73; display: block; text-transform: uppercase;">SUARA</span>
+                            </div>
+                        </div>
+                    `).join('');
+                    
+                    if(containerRightScore) containerRightScore.innerHTML = cardHtmlString;
+                } else if (sudahMemilih > 0) {
+                    const archiveHtmlString = `
+                        <div style="display: flex; align-items: center; justify-content: space-between; background: rgba(79, 70, 229, 0.1); border: 1px solid rgba(99, 102, 241, 0.2); padding: 10px 16px; border-radius: 12px; gap: 12px;">
+                            <div style="display: flex; align-items: center; gap: 12px;">
+                                <div class="w-8 h-8 bg-indigo-600/20 text-indigo-400 font-black flex items-center justify-center rounded-lg text-xs border border-indigo-500/20 flex-shrink-0">
+                                    <i class="bi bi-archive-fill"></i>
+                                </div>
+                                <div>
+                                    <h4 style="margin: 0; font-size: 13px; font-weight: 800; color: #ffffff;">Total Suara Terkunci (${tahunFilter})</h4>
+                                    <p style="margin: 1px 0 0 0; font-size: 10px; font-weight: 600; color: #94a3b8;">Arsip rekam terkunci</p>
+                                </div>
+                            </div>
+                            <div style="text-align: right; flex-shrink: 0;">
+                                <span class="font-mono-kpu text-indigo-400" style="font-size: 16px; font-weight: 900; display: block; line-height: 1;">${sudahMemilih}</span>
+                            </div>
+                        </div>
+                    `;
+                    if(containerRightScore) containerRightScore.innerHTML = archiveHtmlString;
+                } else {
+                    const noDataHtml = `<div class="text-center py-6 text-xs text-slate-500 font-bold">Tidak ada kontestan aktif.</div>`;
+                    if(containerRightScore) containerRightScore.innerHTML = noDataHtml;
+                }
+            }
+        } catch (error) {
+            console.error("Gagal sinkronisasi data arsip/live dashboard:", error);
+        }
+    }
+
+    async function ubahStatusPemilu() {
+        const btnToggle = document.getElementById('btn_toggle_pemilu');
+        if(!btnToggle) return;
+        
+        const statusSaatIni = btnToggle.getAttribute('data-current');
+        const statusBaru = statusSaatIni === 'dimulai' ? 'belum_dimulai' : 'dimulai';
+        
+        const judulAksi = statusBaru === 'dimulai' ? 'Buka Akses Bilik Suara?' : 'Tutup Akses Bilik Suara?';
+        const teksAksi = statusBaru === 'dimulai' ? 'Seluruh pemilih (Siswa & Guru) akan diperbolehkan masuk ke halaman voting.' : 'Siswa dan Guru akan dihadang di halaman login dengan notifikasi bahwa pemilihan belum dibuka.';
+        
+        const konfirmasi = await Swal.fire({
+            title: judulAksi,
+            text: teksAksi,
+            icon: 'question',
+            showCancelButton: true,
+            confirmButtonColor: statusBaru === 'dimulai' ? '#10b981' : '#f59e0b',
+            cancelButtonColor: '#64748b',
+            confirmButtonText: statusBaru === 'dimulai' ? 'Ya, Buka Sekarang!' : 'Ya, Tutup Akses!',
+            cancelButtonText: 'Batal'
+        });
+        
+        if (konfirmasi.isConfirmed) {
+            try {
+                const res = await fetch('/api/superadmin/toggle-pemilu', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ status: statusBaru })
+                });
+                const result = await res.json();
+                if (res.ok && result.status === "success") {
+                    Swal.fire({
+                        title: 'Berhasil!',
+                        text: result.message,
+                        icon: 'success',
+                        confirmButtonColor: '#4f46e5'
+                    });
+                    syncDashboard(); 
+                } else {
+                    Swal.fire('Gagal!', result.message, 'error');
+                }
+            } catch (err) {
+                Swal.fire('Error', 'Gagal memproses permintaan ke server.', 'error');
+            }
+        }
+    }
+
+    async function triggerEmergencyReset() {
+        const { value: textConfirm } = await Swal.fire({
+            title: 'TINDAKAN BERBAHAYA!',
+            text: 'Ketik "RESET TOTAL SISTEM VOTE OSIS" di bawah ini untuk mengosongkan suara, menghapus OTP, dan membuka kunci DPT.',
+            input: 'text',
+            inputPlaceholder: 'Ketik kalimat konfirmasi...',
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#ef4444',
+            cancelButtonColor: '#64748b',
+            confirmButtonText: 'Ya, Hapus & Reset Total!',
+            cancelButtonText: 'Batalkan Tindakan'
+        });
+
+        if (textConfirm) {
+            Swal.fire({ title: 'Memproses Reset Basis Data...', allowOutsideClick: false, didOpen: () => Swal.showLoading() });
+            try {
+                const response = await fetch('/api/superadmin/reset-system', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ konfirmasi: textConfirm })
+                });
+                const resData = await response.json();
+                Swal.close();
+
+                if (response.ok) {
+                    Swal.fire('Sistem Bersih!', resData.message, 'success').then(() => { 
+                        const filterTahunEl = document.getElementById('filter_tahun_select');
+                        if(filterTahunEl) filterTahunEl.options.length = 0;
+                        syncDashboard(); 
+                    });
+                } else {
+                    Swal.fire('Gagal Reset', resData.message, 'error');
+                }
+            } catch {
+                Swal.close();
+                Swal.fire('Error', 'Terjadi gangguan jaringan ke server.', 'error');
+            }
+        }
+    }
+
+    async function triggerLockSnapshot() {
+        const filterTahunEl = document.getElementById('filter_tahun_select');
+        const tahunAktif = filterTahunEl ? filterTahunEl.value : new Date().getFullYear();
+
+        const { value: isConfirmed } = await Swal.fire({
+            title: `Kunci Pemilu Tahun ${tahunAktif}?`,
+            text: `Tindakan ini akan membekukan jumlah DPT, total suara masuk, dan grafik kehadiran tahun ${tahunAktif} ke dalam database arsip secara permanen!`,
+            icon: 'info',
+            showCancelButton: true,
+            confirmButtonColor: '#4f46e5',
+            cancelButtonColor: '#64748b',
+            confirmButtonText: 'Ya, Kunci & Rekam Abadi!',
+            cancelButtonText: 'Batal'
+        });
+
+        if (isConfirmed) {
+            Swal.fire({ title: 'Mengunci data pemilu...', allowOutsideClick: false, didOpen: () => Swal.showLoading() });
+            try {
+                const response = await fetch(`/api/superadmin/kunci-pemilu/${tahunAktif}`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' }
+                });
+                const resData = await response.json();
+                Swal.close();
+
+                if (response.ok && resData.status === "success") {
+                    Swal.fire({
+                        title: 'Berhasil Dikunci!',
+                        text: resData.message,
+                        icon: 'success',
+                        background: '#0f172a',
+                        confirmButtonColor: '#4f46e5'
+                    }).then(() => {
+                        if(filterTahunEl) filterTahunEl.options.length = 0; 
+                        syncDashboard();
+                    });
+                } else {
+                    Swal.fire('Gagal Mengunci', resData.message, 'error');
+                }
+            } catch (err) {
+                Swal.close();
+                Swal.fire('Error', 'Gagal terhubung ke server database.', 'error');
+            }
+        }
+    }
+
+    function handleLogout() {
+        fetch('/api/logout', { method: 'POST' }).then(() => location.href = '/auth/login');
+    }
+
+    async function sendAiMessage(e) {
+        e.preventDefault();
+        const inputEl = document.getElementById('ai-agent-input');
+        const msgContainer = document.getElementById('ai-agent-messages');
+        const query = inputEl.value.trim();
+        
+        if(!query) return;
+
+        msgContainer.innerHTML += `
+            <div class="bg-slate-800 border border-slate-700 p-3 rounded-xl text-slate-100 self-end max-w-[85%] text-right font-bold shadow-md">
+                ${query.split('\n')[0]} ${(query.split('\n').length > 1 ? '...[Data CSV Terdeteksi]' : '')}
+            </div>
+        `;
+        
+        inputEl.value = '';
+        msgContainer.scrollTop = msgContainer.scrollHeight;
+
+        const loadingId = 'ai-loading-' + Date.now();
+        msgContainer.innerHTML += `
+            <div id="${loadingId}" class="text-slate-500 italic font-semibold py-1 self-start animate-pulse">
+                ⏳ Sirekap Engine sedang memproses operasi database AI...
+            </div>
+        `;
+        msgContainer.scrollTop = msgContainer.scrollHeight;
+
+        let payload = { message: query };
+        if (query.includes(',') && query.split('\n').length > 1) {
+            payload = { message: "Proses data CSV massal", csv_data: query };
+        }
+
+        try {
+            const response = await fetch('/api/admin/ai-agent', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(payload)
+            });
+            const result = await response.json();
+            
+            if (document.getElementById(loadingId)) document.getElementById(loadingId).remove();
+
+            if (response.ok && result.status === "success") {
+                const formattedReply = result.reply.replace(/\n/g, '<br>').replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
+                msgContainer.innerHTML += `
+                    <div class="bg-indigo-600/10 border border-indigo-500/20 p-3 rounded-xl line-height-1.6 text-slate-200 self-start max-w-[90%] shadow-md">
+                        ${formattedReply}
+                    </div>
+                `;
+            } else {
+                msgContainer.innerHTML += `
+                    <div class="bg-red-500/10 border border-red-500/20 p-3 rounded-xl text-red-400 font-bold self-start max-w-[90%] shadow-md">
+                        ⚠️ ${result.message || 'Gagal mengeksekusi perintah AI.'}
+                    </div>
+                `;
+            }
+        } catch (error) {
+            if (document.getElementById(loadingId)) document.getElementById(loadingId).remove();
+            msgContainer.innerHTML += `
+                <div class="bg-red-500/10 border border-red-500/20 p-3 rounded-xl text-red-400 font-bold self-start max-w-[90%] shadow-md">
+                    ⚠️ Gangguan transmisi operasi database AI.
+                </div>
+            `;
+        }
+        msgContainer.scrollTop = msgContainer.scrollHeight;
+    }
+
+    async function hapusPemilihReguler(id) {
+    const { value: isConfirmed } = await Swal.fire({
+        title: 'Hapus Pemilih Ini?',
+        text: "Data pemilih akan dihapus permanen dari sistem and log audit akan dicatat!",
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonColor: '#ef4444',
+        cancelButtonColor: '#64748b',
+        confirmButtonText: 'Ya, Hapus Permanen!',
+        cancelButtonText: 'Batal'
+    });
+
+    if (isConfirmed) {
+        try {
+            const response = await fetch(`/api/superadmin/pemilih/hapus/${id}`, {
+                method: 'DELETE', 
+                headers: { 'Content-Type': 'application/json' }
+            });
+            const result = await response.json();
+
+            if (response.ok && result.status === "success") {
+                Swal.fire('Terhapus!', result.message, 'success').then(() => {
+                    location.reload(); 
+                });
+            } else {
+                Swal.fire('Gagal!', result.message, 'error');
+            }
+        } catch (error) {
+            Swal.fire('Error!', 'Gagal terhubung ke server database.', 'error');
+        }
+    }
+}
+    </script>
+</body>
+</html>

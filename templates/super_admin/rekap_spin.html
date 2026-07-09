@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Super Admin - Berita Acara Rekap Nomor Urut</title>
+    <link rel="stylesheet" href="/static/css/style.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800;900&family=JetBrains+Mono:wght@700&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <style>
+        body { font-family: 'Inter', sans-serif; }
+        .font-mono-kpu { font-family: 'JetBrains Mono', monospace; }
+        
+        .clean-scroll::-webkit-scrollbar { 
+            width: 6px; 
+        }
+        .clean-scroll::-webkit-scrollbar-track {
+            background: transparent;
+        }
+        .clean-scroll::-webkit-scrollbar-thumb { 
+            background: #1e293b; 
+            border-radius: 10px; 
+        }
+    </style>
+</head>
+<body class="bg-slate-950 text-slate-100 min-h-screen flex">
+
+    <!-- SIDEBAR UTAMA SUPER ADMIN -->
+    <aside class="w-72 bg-slate-900/70 backdrop-blur-xl border-r border-slate-800 flex flex-col justify-between sticky top-0 h-screen z-50 flex-shrink-0">
+        <div class="p-5">
+            <div class="flex items-center gap-3.5 pb-5 border-b border-slate-800">
+                <div class="bg-indigo-600 p-3 rounded-xl text-white shadow-lg flex items-center justify-center">
+                    <i class="bi bi-shield-check text-2xl"></i>
+                </div>
+                <div>
+                    <h2 class="font-black text-xl text-white leading-none">E-Vote OSIS</h2>
+                    <span class="text-[10px] bg-indigo-500/20 text-indigo-300 px-2.5 py-1 rounded-full font-black tracking-wider block mt-1.5 w-max">SUPER ADMIN</span>
+                </div>
+            </div>
+            <nav class="mt-8 space-y-2">
+                <a href="/superadmin/dashboard" class="flex items-center gap-3.5 px-4 py-3 text-slate-400 hover:text-white hover:bg-slate-900/60 rounded-xl font-bold transition-colors"><i class="bi bi-grid-1x2 text-xl text-slate-500"></i> <span class="text-sm tracking-wide">Dashboard Live</span></a>
+                <a href="/superadmin/manajemen-admin" class="flex items-center gap-3.5 px-4 py-3 text-slate-400 hover:text-white hover:bg-slate-900/60 rounded-xl font-bold transition-colors"><i class="bi bi-people text-xl text-slate-500"></i> <span class="text-sm tracking-wide">Panitia Admin</span></a>
+                <a href="/superadmin/manajemen-paslon" class="flex items-center gap-3.5 px-4 py-3 text-slate-400 hover:text-white hover:bg-slate-900/60 rounded-xl font-bold transition-colors"><i class="bi bi-person-vcard text-xl text-slate-500"></i> <span class="text-sm tracking-wide">Kandidat Paslon</span></a>
+                <a href="/superadmin/data-pemilih" class="flex items-center gap-3.5 px-4 py-3 text-slate-400 hover:text-white hover:bg-slate-900/60 rounded-xl font-bold transition-colors"><i class="bi bi-person-lines-fill text-xl text-slate-500"></i> <span class="text-sm tracking-wide">Master DPT</span></a>
+                <a href="/superadmin/quick-count" class="flex items-center gap-3.5 px-4 py-3 text-slate-400 hover:text-white hover:bg-slate-900/60 rounded-xl font-bold transition-colors"><i class="bi bi-pie-chart text-xl text-slate-500"></i> <span class="text-sm tracking-wide">Quick Count Live</span></a>
+                <a href="/superadmin/spin-paslon" class="flex items-center gap-3.5 px-4 py-3 text-slate-400 hover:text-white hover:bg-slate-900/60 rounded-xl font-bold transition-colors"><i class="bi bi-dice-5-fill text-xl text-slate-500"></i> <span class="text-sm tracking-wide">Roda Putar Paslon</span></a>
+                <a href="/superadmin/rekap-spin" class="flex items-center gap-3.5 px-4 py-3 bg-indigo-600 text-white rounded-xl font-black shadow-lg shadow-indigo-600/20 transition-colors"><i class="bi bi-file-earmark-text-fill text-xl"></i> <span class="text-sm tracking-wide">Rekap Hasil Spin</span></a>
+                <a href="/superadmin/log-aktivitas" class="flex items-center gap-3.5 px-4 py-3 text-slate-400 hover:text-white hover:bg-slate-900/60 rounded-xl font-bold transition-colors"><i class="bi bi-journal-text text-xl text-slate-500"></i> <span class="text-sm tracking-wide">Log Audit Sistem</span></a>
+            </nav>
+        </div>
+        <div class="p-5 border-t border-slate-800 bg-slate-950/40">
+            <button onclick="handleLogout()" class="w-full flex items-center justify-center gap-2 px-4 py-3 bg-red-500/10 hover:bg-red-500 text-red-400 hover:text-white rounded-xl text-xs font-bold border border-red-500/10 transition-all"><i class="bi bi-box-arrow-left text-base"></i> Keluar Sistem</button>
+        </div>
+    </aside>
+
+    <!-- PAPAN DISPLAY REKAPITULASI PLENO -->
+    <main class="flex-1 p-6 lg:p-8 space-y-8 overflow-y-auto max-w-[calc(100vw-18rem)] bg-slate-950">
+        
+        <header class="flex flex-col lg:flex-row justify-between lg:items-center gap-6 pb-6 border-b border-slate-800">
+            <div>
+                <h1 class="text-2xl font-black text-white tracking-tight uppercase">BERITA ACARA PENGUNDIAN NOMOR URUT</h1>
+                <p class="text-slate-400 text-sm mt-1.5 font-medium leading-relaxed">Arsip otentik hasil pengocokan serentak pasangan calon, lengkap dengan waktu otomatis sistem dan data saksi pleno.</p>
+            </div>
+            <div class="flex items-center gap-3 shrink-0">
+                <a href="/superadmin/spin-paslon" class="bg-indigo-600 hover:bg-indigo-500 text-white px-4 py-2.5 rounded-xl text-xs font-bold flex items-center gap-1.5 border-0 shadow-md shadow-indigo-600/20 transition-colors no-underline">
+                    <i class="bi bi-dice-5-fill text-base"></i> Buka Roda Pengocok Baru
+                </a>
+            </div>
+        </header>
+
+        <!-- INPUT BOX SEARCH DINAMIS -->
+        <section class="max-w-md relative">
+            <i class="bi bi-search absolute left-4 top-3.5 text-slate-500 text-base"></i>
+            <input type="text" id="rekap_search_input" oninput="filterRekapData()" class="w-full bg-slate-900/40 border border-slate-800 rounded-xl pl-11 pr-4 py-3 text-white font-medium text-sm focus:border-indigo-500 focus:outline-none placeholder-slate-600" placeholder="Cari nama ketua, wakil, saksi, tahun, hari...">
+        </section>
+
+        <!-- PANEL TABEL REKAP DATABASE -->
+        <section class="bg-slate-900/40 border border-slate-800 rounded-2xl overflow-hidden shadow-2xl">
+            <div class="p-4 border-b border-slate-800 bg-slate-900/20 flex justify-between items-center">
+                <h3 class="text-base font-bold text-white">Dokumen Berita Acara Digital (Tabel Terstruktur)</h3>
+                <span id="rekap_count" class="text-xs bg-indigo-500/10 text-indigo-400 px-3 py-1 rounded-lg font-bold border border-indigo-500/20 font-mono-kpu">0 Baris</span>
+            </div>
+            
+            <div class="overflow-x-auto w-full">
+                <table class="w-full text-left border-collapse text-sm">
+                    <thead>
+                        <tr class="border-b border-slate-800 bg-slate-950/40 text-slate-300 font-bold">
+                            <th class="p-4 w-48">Hari, Tanggal & Jam (Sistem)</th>
+                            <th class="p-4 w-28 text-center">Tahun Pemilu</th>
+                            <th class="p-4">Nama Pasangan Kandidat</th>
+                            <th class="p-4 text-center w-36">Nomor Urut Hasil Spin</th>
+                            <th class="p-4">Saksi-Saksi Sidang Pleno</th>
+                            <th class="p-4 w-32">Operator KPU</th>
+                        </tr>
+                    </thead>
+                    <tbody id="rekap_table_body" class="divide-y divide-slate-800/60 text-slate-200">
+                        <tr><td colspan="6" class="p-8 text-center text-slate-500 font-bold">Menghubungkan basis data rekap pleno...</td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </section>
+    </main>
+
+    <!-- SCRIPT UTAMA AJAX FETCH & DYNAMIC LIVE SEARCH MATCHING DATABASE -->
+    <script>
+        let cachedRekapList = [];
+
+        document.addEventListener('DOMContentLoaded', muatRekapDataDariServer);
+
+        async function muatRekapDataDariServer() {
+            try {
+                const response = await fetch('/api/superadmin/paslon/rekap-spin');
+                const result = await response.json();
+                if (result.status === "success") {
+                    // Masukkan data murni array dari backend
+                    cachedRekapList = result.data;
+                    filterRekapData();
+                }
+            } catch (err) {
+                console.error(err);
+                document.getElementById('rekap_table_body').innerHTML = `
+                    <tr><td colspan="6" class="p-8 text-center text-red-400 font-bold"><i class="bi bi-exclamation-triangle-fill"></i> Gagal memuat arsip berita acara dari server.</td></tr>
+                `;
+            }
+        }
+
+        // ENGINE LIVE SEARCH MULTI-VARIABEL (SUDAH DISINKRONKAN)
+        function filterRekapData() {
+            const query = document.getElementById('rekap_search_input').value.toLowerCase().trim();
+            
+            const filtered = cachedRekapList.filter(r => {
+                // Konversi seluruh parameter kolom database ke string pencarian berhuruf kecil
+                const namaKetua = (r.nama_ketua || '').toLowerCase();
+                const namaWakil = (r.nama_wakil || '').toLowerCase();
+                const saksi = (r.saksi || r.saksi_saksi || '').toLowerCase();
+                const operator = (r.operator || r.operator_aktor || '').toLowerCase();
+                const hari = (r.hari || '').toLowerCase();
+                const tanggal = (r.tanggal || '');
+                const jam = (r.jam || '');
+                const tahun = String(r.tahun || r.tahun_pemilu || '');
+                const nomorUrut = String(r.nomor_urut || r.nomor_urut_didapat || '');
+
+                return namaKetua.includes(query) ||
+                       namaWakil.includes(query) ||
+                       saksi.includes(query) ||
+                       operator.includes(query) ||
+                       hari.includes(query) ||
+                       tanggal.includes(query) ||
+                       jam.includes(query) ||
+                       tahun.includes(query) ||
+                       nomorUrut.includes(query);
+            });
+            renderRekapTable(filtered);
+        }
+
+        // RENDER DAN TRANSLATE DATA VARIABEL KE DALAM DOM TABEL HTML
+        function renderRekapTable(dataList) {
+            const tbody = document.getElementById('rekap_table_body');
+            document.getElementById('rekap_count').innerText = `${dataList.length} Baris`;
+
+            if (dataList.length === 0) {
+                tbody.innerHTML = `
+                    <tr><td colspan="6" class="p-8 text-center text-slate-600 italic font-bold">Tidak ada data dokumen pengocokan yang sesuai dengan kata kunci pencarian.</td></tr>
+                `;
+                return;
+            }
+
+            tbody.innerHTML = dataList.map(r => {
+                // Proteksi Fallback jika nama objek di app.py belum sempat diselaraskan
+                const valHari = r.hari || 'Sidang';
+                const valTanggal = r.tanggal || '';
+                const valJam = r.jam || '';
+                const valTahun = r.tahun || r.tahun_pemilu || '-';
+                const valKetua = r.nama_ketua || '-';
+                const valWakil = r.nama_wakil || '-';
+                const valNomor = r.nomor_urut !== undefined ? r.nomor_urut : r.nomor_urut_didapat;
+                const valSaksi = r.saksi || r.saksi_saksi || '-';
+                const valOperator = r.operator || r.operator_aktor || 'System';
+
+                return `
+                    <tr class="hover:bg-slate-900/30 transition-colors">
+                        <td class="p-4 font-medium">
+                            <span class="text-white font-bold block">${valHari}, ${valTanggal}</span>
+                            <span class="text-[11px] text-slate-400 font-mono-kpu tracking-wide mt-0.5 block">
+                                <i class="bi bi-clock"></i> Pukul ${valJam} WIB
+                            </span>
+                        </td>
+                        <td class="p-4 text-center font-mono-kpu font-black text-indigo-400 bg-indigo-500/5">${valTahun}</td>
+                        <td class="p-4">
+                            <div class="font-bold text-white tracking-tight">${valKetua}</div>
+                            <div class="text-xs text-slate-400 mt-0.5 font-medium">Wakil: ${valWakil}</div>
+                        </td>
+                        <td class="p-4 text-center">
+                            <span class="bg-amber-500/10 text-amber-400 border border-amber-500/25 px-3 py-1 rounded-xl font-mono-kpu font-black text-xs uppercase tracking-wider">
+                                NO. URUT ${valNomor}
+                            </span>
+                        </td>
+                        <td class="p-4 font-semibold text-slate-300 leading-relaxed max-w-xs truncate" title="${valSaksi}">
+                            <i class="bi bi-patch-check text-slate-500 mr-1 text-xs"></i> ${valSaksi}
+                        </td>
+                        <td class="p-4 text-slate-400 font-mono-kpu text-xs">@${valOperator}</td>
+                    </tr>
+                `;
+            }).join('');
+        }
+
+        function handleLogout() { fetch('/api/logout', { method: 'POST' }).then(() => location.href = '/auth/login'); }
+    </script>
+</body>
+</html>

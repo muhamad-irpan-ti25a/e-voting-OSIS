@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bilik Suara Premium - E-Voting OSIS 2026</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@500;600;700;800;900&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <style>
+        body { 
+            font-family: 'Plus Jakarta Sans', sans-serif; 
+            background-color: #121212;
+            color: #ffffff;
+        }
+
+        /* SYMMETRY LAYOUT ENGINE: items-stretch membuat tinggi kiri dan kanan sama persis */
+        .spotify-wrapper {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 40px;
+            align-items: stretch; 
+        }
+        @media (min-width: 1280px) {
+            .spotify-wrapper {
+                grid-template-columns: 48fr 52fr;
+            }
+        }
+
+        /* Hapus height kaku (640px) agar mengikuti container induk secara fleksibel */
+        .about-artist-box {
+            background-size: cover;
+            background-position: center;
+            border-radius: 20px;
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            padding: 48px;
+            border: 1px solid rgba(255,255,255,0.03);
+        }
+
+        .spotify-panel-dark {
+            background-color: #1e1e1e;
+            border-radius: 20px;
+            padding: 44px 48px;
+            border: 1px solid rgba(255,255,255,0.02);
+        }
+
+        .spotify-pill-btn {
+            background-color: #1ed760;
+            color: #000000;
+            border: none;
+            padding: 18px 44px;
+            border-radius: 50px;
+            font-weight: 900;
+            font-size: 18px;
+            letter-spacing: -0.01em;
+            cursor: pointer;
+            transition: all 0.2s cubic-bezier(0.3, 0, 0, 1);
+            text-transform: uppercase;
+        }
+        .spotify-pill-btn:hover {
+            transform: scale(1.05);
+            background-color: #1fdf64;
+            box-shadow: 0 0 30px rgba(30, 215, 96, 0.4);
+        }
+
+        .clean-scroll::-webkit-scrollbar { 
+            width: 6px; 
+        }
+        .clean-scroll::-webkit-scrollbar-track {
+            background: transparent;
+        }
+        .clean-scroll::-webkit-scrollbar-thumb { 
+            background: #535353; 
+            border-radius: 10px; 
+        }
+        .clean-scroll::-webkit-scrollbar-thumb:hover {
+            background: #b3b3b3;
+        }
+    </style>
+</head>
+<body class="min-h-screen flex flex-col justify-between selection:bg-white selection:text-black">
+
+    <!-- NAVBAR ATAS -->
+    <nav class="bg-[#080808] h-24 flex items-center justify-between px-8 lg:px-16 border-b border-[#242424] sticky top-0 z-50">
+        <div class="flex items-center gap-4">
+            <div class="w-4 h-4 bg-[#1ed760] rounded-full animate-pulse shadow-[0_0_12px_#1ed760]"></div>
+            <span class="text-xl lg:text-2xl font-black tracking-wider text-white uppercase">
+                Bilik Suara Digital Paslon OSIS
+            </span>
+        </div>
+        <div class="text-sm lg:text-base font-black tracking-widest text-[#1ed760] uppercase border-2 border-[#1ed760]/30 px-5 py-2 rounded-xl bg-[#1ed760]/5 shadow-inner">
+            <i class="bi bi-shield-fill-check mr-2"></i> Secure Connection
+        </div>
+    </nav>
+
+    <!-- CONTENT WRAPPER -->
+    <main class="max-w-[1600px] mx-auto px-6 lg:px-12 py-16 flex-1 w-full">
+        <div id="paslon_grid_container" class="space-y-20">
+            <!-- Data Paslon akan di-render secara dinamis oleh vote.js -->
+        </div>
+    </main>
+
+    <!-- FOOTER -->
+    <footer class="py-8 text-center text-xs text-gray-500 font-bold tracking-widest uppercase bg-[#080808] border-t border-[#242424]">
+        &copy; 2026 E-Vote Engine Corp. Designed for High-Scale School Democracy.
+    </footer>
+
+    <script src="/static/js/vote.js?v={{ range(1000, 9999) | random }}"></script>
+</body>
+</html>

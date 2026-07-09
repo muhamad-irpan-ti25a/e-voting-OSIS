@@ -1,0 +1,296 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Operator TPS - Dashboard Kontrol</title>
+    <link rel="stylesheet" href="/static/css/style.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800;900&family=JetBrains+Mono:wght@700&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <style>
+        body { font-family: 'Inter', sans-serif; }
+        .font-mono-kpu { font-family: 'JetBrains Mono', monospace; }
+        
+        .clean-scroll::-webkit-scrollbar { width: 6px; }
+        .clean-scroll::-webkit-scrollbar-track { background: transparent; }
+        .clean-scroll::-webkit-scrollbar-thumb { background: #1e293b; border-radius: 10px; }
+    </style>
+</head>
+<body class="bg-slate-950 text-slate-100 min-h-screen flex">
+
+    <!-- SIDEBAR NAVIGASI (DOWNSIZE TIPOGRAFI PROPORSI NORMAL) -->
+    <aside class="w-72 bg-slate-900/70 backdrop-blur-xl border-r border-slate-800 flex flex-col justify-between sticky top-0 h-screen z-50 flex-shrink-0">
+        <div class="p-5">
+            <!-- BRANDING LOGO -->
+            <div class="flex items-center gap-3 pb-5 border-b border-slate-800">
+                <div class="bg-indigo-600 p-2.5 rounded-lg text-white shadow-md shadow-indigo-600/20 flex items-center justify-center">
+                    <i class="bi bi-shield-check text-2xl"></i>
+                </div>
+                <div>
+                    <h2 class="font-black text-xl tracking-tight text-white leading-none">E-Vote OSIS</h2>
+                    <span class="text-[10px] bg-emerald-500/20 text-emerald-300 px-2.5 py-1 rounded-full font-black tracking-wider block mt-1.5 w-max uppercase">PANITIA KPO</span>
+                </div>
+            </div>
+            
+            <!-- MENU NAVIGASI STANDARD -->
+            <nav class="mt-6 space-y-2">
+                <a href="/admin/dashboard" class="flex items-center gap-3.5 px-4 py-3 bg-indigo-600 text-white rounded-xl font-bold transition-colors">
+                    <i class="bi bi-grid-1x2 text-xl"></i> 
+                    <span class="text-sm tracking-wide">Dashboard</span>
+                </a>
+                <a href="/admin/daftar-paslon" class="flex items-center gap-3.5 px-4 py-3 text-slate-400 hover:text-white hover:bg-slate-900/60 rounded-xl font-bold transition-colors">
+                    <i class="bi bi-card-list text-xl text-slate-500"></i> 
+                    <span class="text-sm tracking-wide">Daftar Paslon</span>
+                </a>
+                <a href="/admin/data-pemilih" class="flex items-center gap-3.5 px-4 py-3 text-slate-400 hover:text-white hover:bg-slate-900/60 rounded-xl font-bold transition-colors">
+                    <i class="bi bi-person-lines-fill text-xl text-slate-500"></i> 
+                    <span class="text-sm tracking-wide">Master DPT</span>
+                </a>
+                <a href="/admin/quick-count" class="flex items-center gap-3.5 px-4 py-3 text-slate-400 hover:text-white hover:bg-slate-900/60 rounded-xl font-bold transition-colors">
+                    <i class="bi bi-pie-chart text-xl text-slate-500"></i> 
+                    <span class="text-sm tracking-wide">Quick Count Live</span>
+                </a>
+            </nav>
+        </div>
+
+        <!-- PROFILE FOOTER SIDEBAR -->
+        <div class="p-5 border-t border-slate-800 bg-slate-950/40">
+            <div class="flex items-center gap-3 mb-4 px-1">
+                <div class="w-10 h-10 rounded-full bg-indigo-600 flex items-center justify-center border border-indigo-400 flex-shrink-0">
+                    <i class="bi bi-person-badge-fill text-white text-lg"></i>
+                </div>
+                <div class="truncate flex-1">
+                    <h4 class="text-sm font-black text-white truncate leading-tight">{{ session.get('nama_lengkap', 'Operator TPS') }}</h4>
+                    <span class="text-xs font-mono-kpu text-slate-400 font-semibold block mt-0.5 truncate">ID: {{ session.get('username', 'PANITIA_KPO') }}</span>
+                    <span class="text-[10px] text-emerald-400 block font-bold mt-0.5 uppercase tracking-wide">● Wilayah TPS Aktif</span>
+                </div>
+            </div>
+            <button onclick="handleLogout()" class="w-full flex items-center justify-center gap-2 px-4 py-2.5 bg-red-500/10 hover:bg-red-500 text-red-400 hover:text-white rounded-xl text-xs font-bold transition-all border border-red-500/10 hover:border-transparent">
+                <i class="bi bi-box-arrow-left text-base"></i> Keluar Sistem
+            </button>
+        </div>
+    </aside>
+
+    <!-- CONTENT AREA -->
+    <main class="flex-1 p-6 lg:p-8 space-y-6 overflow-y-auto max-w-[calc(100vw-18rem)]">
+        
+        <!-- HEADER UTAMA -->
+        <header class="pb-5 border-b border-slate-800 flex flex-col xl:flex-row justify-between items-start xl:items-center gap-4">
+            <div class="max-w-3xl">
+                <span class="text-[10px] bg-indigo-500/20 text-indigo-300 px-2.5 py-1 rounded-full font-bold tracking-wider uppercase border border-indigo-500/15">PANEL MONITOR OPERATOR</span>
+                <h1 class="text-2xl font-black text-white tracking-tight mt-2 mb-1">Kendali Jalur Jalannya Pemilihan</h1>
+                <p class="text-slate-400 text-sm font-medium">Pantau pergerakan antrean, status aktivasi token WhatsApp pemilih, dan kehadiran DPT secara real-time.</p>
+            </div>
+            
+            <!-- GATEWAY WIDGET -->
+            <div class="bg-slate-900 border border-slate-800 rounded-xl p-3 flex items-center gap-3 shadow-lg min-w-[240px]">
+                <div class="bg-emerald-500/10 text-emerald-400 p-2.5 rounded-lg text-xl flex items-center justify-center">
+                    <i class="bi bi-whatsapp"></i>
+                </div>
+                <div>
+                    <span class="text-[10px] text-slate-400 font-bold block uppercase tracking-wider">Gateway Fonnte</span>
+                    <div class="flex items-center gap-1.5 mt-0.5">
+                        <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+                        <h4 class="text-xs font-bold text-white tracking-wide">Connected / Online</h4>
+                    </div>
+                </div>
+            </div>
+        </header>
+
+        <!-- KARTU METRIK UTAMA -->
+        <section class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+            <div class="bg-slate-900/60 border border-slate-800 p-5 rounded-xl flex justify-between items-center shadow-md">
+                <div>
+                    <span class="text-xs text-slate-400 font-bold block uppercase tracking-wider">Total Kuota DPT</span>
+                    <h3 id="panel_total_pemilih" class="text-2xl font-black text-white font-mono-kpu mt-1 leading-none">0</h3>
+                </div>
+                <div class="text-indigo-400 text-xl bg-indigo-500/10 p-2.5 rounded-lg flex items-center justify-center"><i class="bi bi-people-fill"></i></div>
+            </div>
+            <div class="bg-slate-900/60 border border-slate-800 p-5 rounded-xl flex justify-between items-center shadow-md">
+                <div>
+                    <span class="text-xs text-slate-400 font-bold block uppercase tracking-wider">Sudah Hadir (Voted)</span>
+                    <h3 id="panel_sudah_memilih" class="text-2xl font-black text-emerald-400 font-mono-kpu mt-1 leading-none">0</h3>
+                </div>
+                <div class="text-emerald-400 text-xl bg-emerald-500/10 p-2.5 rounded-lg flex items-center justify-center"><i class="bi bi-check-circle-fill"></i></div>
+            </div>
+            <div class="bg-slate-900/60 border border-slate-800 p-5 rounded-xl flex justify-between items-center shadow-md">
+                <div>
+                    <span class="text-xs text-slate-400 font-bold block uppercase tracking-wider">Belum Datang</span>
+                    <h3 id="panel_belum_memilih" class="text-2xl font-black text-amber-400 font-mono-kpu mt-1 leading-none">0</h3>
+                </div>
+                <div class="text-amber-400 text-xl bg-amber-500/10 p-2.5 rounded-lg flex items-center justify-center"><i class="bi bi-clock-history"></i></div>
+            </div>
+            <div class="bg-slate-900/60 border border-slate-800 p-5 rounded-xl flex justify-between items-center shadow-md">
+                <div>
+                    <span class="text-xs text-slate-400 font-bold block uppercase tracking-wider">Tingkat Kehadiran</span>
+                    <h3 id="panel_partisipasi" class="text-2xl font-black text-white font-mono-kpu mt-1 leading-none">0.0%</h3>
+                </div>
+                <div class="text-indigo-400 text-xl bg-indigo-500/10 p-2.5 rounded-lg flex items-center justify-center"><i class="bi bi-percent"></i></div>
+            </div>
+        </section>
+
+        <!-- AREA PARTISIPASI KLUSTER DEMOGRAFI -->
+        <section class="grid grid-cols-1 lg:grid-cols-2 gap-4">
+            <div class="bg-slate-900/40 border border-slate-800 p-5 rounded-xl shadow-lg space-y-3">
+                <div class="flex items-center gap-2 border-b border-slate-800/60 pb-2.5">
+                    <div class="bg-blue-500/10 text-blue-400 p-2 rounded-lg text-base flex items-center justify-center"><i class="bi bi-mortarboard-fill"></i></div>
+                    <h3 class="text-sm font-bold text-white uppercase tracking-wide">Partisipasi Kluster Siswa</h3>
+                </div>
+                <div class="grid grid-cols-2 gap-4">
+                    <div>
+                        <span class="text-[11px] text-slate-400 font-bold block uppercase tracking-wide">Total DPT Siswa</span>
+                        <span id="demografi_siswa_total" class="text-xl font-black text-white font-mono-kpu block mt-0.5">0</span>
+                    </div>
+                    <div>
+                        <span class="text-[11px] text-slate-400 font-bold block uppercase tracking-wide">Siswa Sudah Vote</span>
+                        <span id="demografi_siswa_voted" class="text-xl font-black text-blue-400 font-mono-kpu block mt-0.5">0</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="bg-slate-900/40 border border-slate-800 p-5 rounded-xl shadow-lg space-y-3">
+                <div class="flex items-center gap-2 border-b border-slate-800/60 pb-2.5">
+                    <div class="bg-amber-500/10 text-amber-400 p-2 rounded-lg text-base flex items-center justify-center"><i class="bi bi-briefcase-fill"></i></div>
+                    <h3 class="text-sm font-bold text-white uppercase tracking-wide">Partisipasi Kluster Guru & Staf</h3>
+                </div>
+                <div class="grid grid-cols-2 gap-4">
+                    <div>
+                        <span class="text-[11px] text-slate-400 font-bold block uppercase tracking-wide">Total DPT Guru</span>
+                        <span id="demografi_guru_total" class="text-xl font-black text-white font-mono-kpu block mt-0.5">0</span>
+                    </div>
+                    <div>
+                        <span class="text-[11px] text-slate-400 font-bold block uppercase tracking-wide">Guru Sudah Vote</span>
+                        <span id="demografi_guru_voted" class="text-xl font-black text-amber-400 font-mono-kpu block mt-0.5">0</span>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- AREA TABEL JALUR ANTREAN -->
+        <section class="bg-slate-900/40 border border-slate-800 rounded-xl p-5 shadow-lg space-y-4">
+            <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center border-b border-slate-800 pb-3 gap-3">
+                <div>
+                    <h3 class="text-sm font-bold text-white uppercase tracking-wide">Alur Aktivasi Pemilih Terakhir</h3>
+                    <p class="text-xs text-slate-400 font-medium mt-0.5">Pantau jika terdapat pemilih yang mengalami kegagalan verifikasi token di lapangan.</p>
+                </div>
+                
+                <!-- DUA TOMBOL AKSI -->
+                <div class="flex flex-wrap gap-2 w-full sm:w-auto">
+                    <a href="/api/admin/pemilih/ekspor" class="bg-indigo-600 hover:bg-indigo-500 text-white px-3 py-2 rounded-lg text-xs font-bold transition-all flex items-center gap-1.5 shadow-md">
+                        <i class="bi bi-file-earmark-arrow-down-fill"></i> Ekspor CSV
+                    </a>
+                    <button onclick="loadLiveOperatorStats()" class="bg-slate-800 hover:bg-slate-700 text-slate-100 px-3 py-2 rounded-lg border border-slate-700 text-xs font-bold transition-colors flex items-center gap-1.5">
+                        <i class="bi bi-arrow-clockwise"></i> Segarkan Data
+                    </button>
+                </div>
+            </div>
+
+            <div class="overflow-x-auto w-full clean-scroll">
+                <table class="w-full text-left border-collapse">
+                    <thead>
+                        <tr class="border-b border-slate-800 text-slate-400 font-bold text-xs uppercase tracking-wider">
+                            <th class="pb-2.5 pt-1">Pemilih</th>
+                            <th class="pb-2.5 pt-1">Kategori</th>
+                            <th class="pb-2.5 pt-1">Nomor WhatsApp</th>
+                            <th class="pb-2.5 pt-1">Status Akun</th>
+                        </tr>
+                    </thead>
+                    <tbody id="operator_live_tbody" class="divide-y divide-slate-800/40 text-xs text-slate-200">
+                        <tr>
+                            <td colspan="4" class="py-6 text-center text-slate-500 text-sm font-medium">Memuat jalur data antrean TPS...</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </section>
+    </main>
+
+    <script>
+         document.addEventListener('DOMContentLoaded', () => {
+            loadLiveOperatorStats();
+            setInterval(loadLiveOperatorStats, 6000);
+        });
+
+        async function loadLiveOperatorStats() {
+            try {
+                // 1. Ambil data mentah pemilih terlebih dahulu untuk kalkulasi riil data aktif
+                const resPemilih = await fetch('/api/admin/pemilih');
+                const resultPemilih = await resPemilih.json();
+
+                if (resultPemilih.status === "success") {
+                    // FILTER UTAMA: Singkirkan semua DPT yang statusnya diarsipkan (is_archived: 1)
+                    const allData = resultPemilih.data.filter(p => !p.is_archived || p.is_archived == 0);
+                    
+                    // 2. KALKULASI MANDIRI DATA AKTIF (Mencegah kebocoran data arsip dari backend summary)
+                    const totalPemilih = allData.length;
+                    const sudahMemilih = allData.filter(p => p.sudah_memilih === 1).length;
+                    const belumMemilih = totalPemilih - sudahMemilih;
+                    
+                    // Hitung persentase partisipasi secara presisi
+                    const partisipasiPercent = totalPemilih > 0 ? ((sudahMemilih / totalPemilih) * 100).toFixed(2) : "0.00";
+
+                    // Kalkulasi berdasarkan Kluster Demografi Aktif
+                    const totalSiswa = allData.filter(p => p.role === 'siswa').length;
+                    const siswaVoted = allData.filter(p => p.role === 'siswa' && p.sudah_memilih === 1).length;
+                    
+                    const totalGuru = allData.filter(p => p.role === 'guru').length;
+                    const guruVoted = allData.filter(p => p.role === 'guru' && p.sudah_memilih === 1).length;
+
+                    // 3. SUNTIKKAN DATA HASIL HITUNG ULANG KE KARTU METRIK UTAMA
+                    document.getElementById('panel_total_pemilih').innerText = totalPemilih;
+                    document.getElementById('panel_sudah_memilih').innerText = sudahMemilih;
+                    document.getElementById('panel_belum_memilih').innerText = belumMemilih;
+                    document.getElementById('panel_partisipasi').innerText = partisipasiPercent + '%';
+                    
+                    // Suntikkan data ke Kluster Demografi Siswa & Guru
+                    document.getElementById('demografi_siswa_total').innerText = totalSiswa;
+                    document.getElementById('demografi_siswa_voted').innerText = siswaVoted;
+                    document.getElementById('demografi_guru_total').innerText = totalGuru;
+                    document.getElementById('demografi_guru_voted').innerText = guruVoted;
+
+                    // 4. RENDER TABEL JALUR ANTREAN LIVE (MAKSIMAL 8 DATA AKTIF TERBARU)
+                    const tbody = document.getElementById('operator_live_tbody');
+                    const dataMonitor = allData.slice(0, 8);
+
+                    if (dataMonitor.length === 0) {
+                        tbody.innerHTML = `<tr><td colspan="4" class="py-6 text-center text-slate-500 text-xs">Tidak ada data pemilih yang aktif di sistem.</td></tr>`;
+                        return;
+                    }
+
+                    tbody.innerHTML = dataMonitor.map(p => {
+                        const statusBadge = p.sudah_memilih === 1
+                            ? `<span class="bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 px-2 py-0.5 rounded text-[11px] font-bold uppercase flex items-center gap-1 w-max"><i class="bi bi-check2-circle"></i> Selesai Memilih</span>`
+                            : (p.nomor_wa 
+                                ? `<span class="bg-indigo-500/10 text-indigo-400 border border-indigo-500/20 px-2 py-0.5 rounded text-[11px] font-bold uppercase flex items-center gap-1 w-max"><i class="bi bi-unlock-fill"></i> Siap Memilih</span>`
+                                : `<span class="bg-amber-500/10 text-amber-400 border border-amber-500/20 px-2 py-0.5 rounded text-[11px] font-bold uppercase flex items-center gap-1 w-max"><i class="bi bi-lock-fill"></i> Belum Aktivasi</span>`);
+
+                        const waDisplay = p.nomor_wa ? `+62 ${p.nomor_wa}` : `<span class="text-slate-500 font-medium">Kosong</span>`;
+                        const kelasDisplay = p.kelas ? `<span class="text-[10px] inline-block text-slate-400 font-bold uppercase bg-slate-800 px-1.5 py-0.5 rounded border border-slate-700 ml-1.5">${p.kelas}</span>` : '';
+
+                        return `
+                            <tr class="hover:bg-slate-900/20 transition-colors">
+                                <td class="py-3 font-bold text-white text-xs">
+                                    ${p.nama_lengkap}
+                                    <span class="block text-[11px] font-mono text-slate-400 font-semibold mt-0.5">${p.username}</span>
+                                </td>
+                                <td class="py-3 font-bold text-slate-300 uppercase text-[11px] tracking-wider">
+                                    ${p.role} ${kelasDisplay}
+                                </td>
+                                <td class="py-3 font-mono text-xs font-semibold text-slate-100">${waDisplay}</td>
+                                <td class="py-3">${statusBadge}</td>
+                            </tr>
+                        `;
+                    }).join('');
+                }
+            } catch (error) {
+                console.error("Gagal sinkronisasi hitung ulang data aktif dashboard operator:", error);
+            }
+        }
+
+        function handleLogout() {
+            fetch('/api/logout', { method: 'POST' }).then(() => location.href = '/auth/login');
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,565 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Super Admin - Kelola Panitia Admin</title>
+    <link rel="stylesheet" href="/static/css/style.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800;900&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <style>
+        body { font-family: 'Inter', sans-serif; }
+    </style>
+</head>
+<body class="bg-slate-950 text-slate-100 min-h-screen flex">
+
+    <!-- SIDEBAR NAVIGASI PANEL (SKALA TIPOGRAFI PROPORSI NORMAL) -->
+    <aside class="w-72 bg-slate-900/70 backdrop-blur-xl border-r border-slate-800 flex flex-col justify-between sticky top-0 h-screen z-50">
+        <div class="p-5">
+            <div class="flex items-center gap-3.5 pb-5 border-b border-slate-800">
+                <div class="bg-indigo-600 p-3 rounded-xl text-white shadow-lg flex items-center justify-center">
+                    <i class="bi bi-shield-check text-2xl"></i>
+                </div>
+                <div>
+                    <h2 class="font-black text-xl tracking-tight text-white leading-none">E-Vote OSIS</h2>
+                    <span class="text-[10px] bg-indigo-500/20 text-indigo-300 px-2.5 py-1 rounded-full font-black tracking-wider block mt-1.5 w-max">SUPER ADMIN</span>
+                </div>
+            </div>
+            <nav class="mt-8 space-y-2">
+                <a href="/superadmin/dashboard" class="flex items-center gap-3.5 px-4 py-3 text-slate-400 hover:text-white hover:bg-slate-900/60 rounded-xl font-bold transition-colors">
+                    <i class="bi bi-grid-1x2 text-xl text-slate-500"></i> 
+                    <span class="text-sm tracking-wide">Dashboard Live</span>
+                </a>
+                <a href="/superadmin/manajemen-admin" class="flex items-center gap-3.5 px-4 py-3 bg-indigo-600 text-white rounded-xl font-black shadow-lg transition-colors">
+                    <i class="bi bi-people-fill text-xl"></i> 
+                    <span class="text-sm tracking-wide">Panitia Admin</span>
+                </a>
+                <a href="/superadmin/manajemen-paslon" class="flex items-center gap-3.5 px-4 py-3 text-slate-400 hover:text-white hover:bg-slate-900/60 rounded-xl font-bold transition-colors">
+                    <i class="bi bi-person-vcard text-xl text-slate-500"></i> 
+                    <span class="text-sm tracking-wide">Kandidat Paslon</span>
+                </a>
+                <a href="/superadmin/data-pemilih" class="flex items-center gap-3.5 px-4 py-3 text-slate-400 hover:text-white hover:bg-slate-900/60 rounded-xl font-bold transition-colors">
+                    <i class="bi bi-person-lines-fill text-xl text-slate-500"></i> 
+                    <span class="text-sm tracking-wide">Master DPT</span>
+                </a>
+                <a href="/superadmin/quick-count" class="flex items-center gap-3.5 px-4 py-3 text-slate-400 hover:text-white hover:bg-slate-900/60 rounded-xl font-bold transition-colors">
+                    <i class="bi bi-pie-chart text-xl text-slate-500"></i> 
+                    <span class="text-sm tracking-wide">Quick Count Live</span>
+                </a>
+                <a href="/superadmin/log-aktivitas" class="flex items-center gap-3.5 px-4 py-3 text-slate-400 hover:text-white hover:bg-slate-900/60 rounded-xl font-bold transition-colors">
+                    <i class="bi bi-journal-text text-xl text-slate-500"></i> 
+                    <span class="text-sm tracking-wide">Log Audit Sistem</span>
+                </a>
+            </nav>
+        </div>
+        <div class="p-5 border-t border-slate-800 bg-slate-950/40">
+            <div class="flex items-center gap-3 mb-5 px-1">
+                <div class="w-11 h-11 rounded-full bg-slate-800 flex items-center justify-center border border-slate-700 shadow-inner">
+                    <i class="bi bi-person-fill text-slate-200 text-xl"></i>
+                </div>
+                <div class="truncate flex-1">
+                    <h4 class="text-sm font-bold text-white truncate leading-tight">Super Admin</h4>
+                    <span class="text-[11px] text-emerald-400 block font-bold mt-0.5">● Online</span>
+                </div>
+            </div>
+            <button onclick="handleLogout()" class="w-full flex items-center justify-center gap-2 px-4 py-3 bg-red-500/10 hover:bg-red-500 text-red-400 hover:text-white rounded-xl text-xs font-bold border border-red-500/10 hover:border-transparent shadow-md">
+                <i class="bi bi-box-arrow-left text-base"></i> Keluar Sistem
+            </button>
+        </div>
+    </aside>
+
+    <!-- AREA PANEL UTAMA (DOWNSIZE TIPOGRAFI AGAR LEBIH PADAT & RAPI) -->
+    <main class="flex-1 p-6 lg:p-8 space-y-8 overflow-y-auto max-w-[calc(100vw-18rem)]">
+        <header class="flex flex-col sm:flex-row justify-between sm:items-center gap-4 pb-5 border-b border-slate-800">
+            <div>
+                <h1 class="text-2xl font-black text-white tracking-tight">Manajemen Panitia Admin</h1>
+                <p class="text-slate-400 text-sm mt-1 font-medium">Mendaftarkan hak akses mandiri operasional petugas penjaga TPS.</p>
+            </div>
+            <button onclick="openAddModal()" class="bg-indigo-600 hover:bg-indigo-500 text-white px-4 py-2.5 rounded-xl text-xs font-bold transition-all shadow-md flex items-center gap-1.5">
+                <i class="bi bi-person-plus-fill text-base"></i> Pendaftaran Panitia TPS
+            </button>
+        </header>
+
+        <div class="flex border-b border-slate-800 gap-1">
+            <button id="tab_aktif" onclick="switchTab('aktif')" class="px-4 py-2.5 border-b-2 border-indigo-600 text-white font-bold text-sm tracking-wide flex items-center gap-1.5 transition-all">
+                <i class="bi bi-people-fill"></i> Panitia TPS Aktif
+            </button>
+            <button id="tab_arsip" onclick="switchTab('arsip')" class="px-4 py-2.5 border-b-2 border-transparent text-slate-400 hover:text-white font-bold text-sm tracking-wide flex items-center gap-1.5 transition-all">
+                <i class="bi bi-archive-fill"></i> Gudang Arsip Tahunan
+            </button>
+        </div>
+
+        <div class="flex flex-col md:flex-row gap-3 justify-between items-center bg-slate-900/30 p-3 border border-slate-800 rounded-xl shadow-xl">
+            <div class="relative w-full md:w-80">
+                <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-slate-400 text-base"><i class="bi bi-search"></i></span>
+                <input type="text" id="live_search_input" oninput="handleLiveSearch()" class="w-full bg-slate-950 border border-slate-800 rounded-xl pl-9 pr-3 py-2 text-white font-medium text-sm focus:border-indigo-500 focus:outline-none" placeholder="Cari username atau nama...">
+            </div>
+            <div id="tahun_filter_wrapper" class="hidden items-center gap-2 w-full md:w-auto">
+                <label class="text-slate-400 font-bold text-sm whitespace-nowrap"><i class="bi bi-funnel-fill"></i> Tahun Arsip:</label>
+                <select id="filter_tahun_select" onchange="renderTableData()" class="bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-white font-bold text-sm focus:outline-none cursor-pointer w-full md:w-40">
+                    <option value="ALL">Semua Tahun</option>
+                </select>
+            </div>
+        </div>
+
+        <section class="bg-slate-900/40 border border-slate-800 rounded-2xl overflow-hidden shadow-2xl">
+            <div class="p-4 border-b border-slate-800 bg-slate-900/20 flex justify-between items-center">
+                <h3 id="table_title" class="text-lg font-bold text-white">Daftar Akun Panitia Aktif</h3>
+                <span id="admin_count" class="text-xs bg-indigo-500/10 text-indigo-400 px-3 py-1 rounded-lg font-bold border border-indigo-500/20">0 Terdata</span>
+            </div>
+            <div class="overflow-x-auto w-full">
+                <table class="w-full text-left border-collapse">
+                    <thead>
+                        <tr class="border-b border-slate-800 bg-slate-950/40 text-white font-bold text-sm">
+                            <th class="p-4 w-20 text-center">ID</th>
+                            <th class="p-4">Username Login</th>
+                            <th class="p-4">Nama Anggota</th>
+                            <th class="p-4">No WhatsApp</th>
+                            <th class="p-4 text-center">Akses TPS</th>
+                            <th class="p-4 w-[360px] text-center">Opsi Operasi</th>
+                        </tr>
+                    </thead>
+                    <tbody id="admin_table_body" class="divide-y divide-slate-800/60 text-sm font-medium text-slate-200">
+                        <tr><td colspan="6" class="p-8 text-center text-slate-500">Mengambil data kepanitiaan dari server...</td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </section>
+    </main>
+
+    <!-- MODAL ADD PANITIA -->
+    <div id="add_admin_modal" class="hidden fixed inset-0 bg-slate-950/80 backdrop-blur-md z-50 flex items-center justify-center p-4 overflow-y-auto">
+        <div class="bg-slate-900 border border-slate-800 w-full max-w-lg rounded-2xl shadow-2xl overflow-hidden animate-in fade-in zoom-in-95 duration-200 my-4">
+            <div class="p-4 border-b border-slate-800 bg-slate-950/40 flex justify-between items-center">
+                <h3 class="text-lg font-bold text-white">Daftarkan Panitia Baru</h3>
+                <button onclick="closeAddModal()" class="text-slate-400 hover:text-white text-xl"><i class="bi bi-x-lg"></i></button>
+            </div>
+            <form id="add_admin_form" onsubmit="submitAdminForm(event)" class="p-5 space-y-3" enctype="multipart/form-data">
+                <div>
+                    <label class="block text-xs font-bold text-slate-300 uppercase tracking-wide mb-1">Username Login Baru</label>
+                    <input type="text" id="form_username" required class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-white font-medium text-sm" placeholder="Contoh: admin01">
+                </div>
+                <div>
+                    <label class="block text-xs font-bold text-slate-300 uppercase tracking-wide mb-1">Nama Lengkap Panitia</label>
+                    <input type="text" id="form_nama_panitia" required class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-white font-medium text-sm" placeholder="Nama lengkap petugas...">
+                </div>
+                <div>
+                    <label class="block text-xs font-bold text-slate-300 uppercase tracking-wide mb-1">Nomor WhatsApp</label>
+                    <input type="text" id="form_nomor_wa" required class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-white font-medium text-sm" placeholder="Contoh: 085798...">
+                </div>
+                <div>
+                    <label class="block text-xs font-bold text-slate-300 uppercase tracking-wide mb-1">Tahun Menjabat</label>
+                    <input type="number" id="form_tahun_menjabat" required class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-white font-medium text-sm" value="2026">
+                </div>
+                <div>
+                    <label class="block text-xs font-bold text-slate-300 uppercase tracking-wide mb-1">Foto Atribut</label>
+                    <input type="file" id="form_foto" accept="image/*" class="w-full bg-slate-950 border border-slate-800 rounded-xl p-1.5 text-xs text-slate-400">
+                </div>
+                <div>
+                    <label class="block text-xs font-bold text-slate-300 uppercase tracking-wide mb-1">Kata Sandi Akses</label>
+                    <input type="password" id="form_password" required class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-white font-medium text-sm" placeholder="Sandi login operator...">
+                </div>
+                <div class="pt-3 flex gap-3">
+                    <button type="button" onclick="closeAddModal()" class="w-1/2 bg-slate-800 text-white py-2.5 rounded-xl font-bold text-sm">Batal</button>
+                    <button type="submit" class="w-1/2 bg-indigo-600 text-white py-2.5 rounded-xl font-bold text-sm shadow-md">Daftarkan Operator</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- MODAL EDIT PANITIA -->
+    <div id="edit_admin_modal" class="hidden fixed inset-0 bg-slate-950/80 backdrop-blur-md z-50 flex items-center justify-center p-4">
+        <div class="bg-slate-900 border border-slate-800 w-full max-w-lg rounded-2xl shadow-2xl overflow-hidden">
+            <div class="p-4 border-b border-slate-800 bg-slate-950/40 flex justify-between items-center">
+                <h3 class="text-lg font-bold text-white">Perbarui Informasi Panitia</h3>
+                <button onclick="closeEditModal()" class="text-slate-400 hover:text-white text-xl"><i class="bi bi-x-lg"></i></button>
+            </div>
+            <form id="edit_admin_form" onsubmit="submitEditForm(event)" class="p-5 space-y-4">
+                <input type="hidden" id="edit_form_id">
+                <div>
+                    <label class="block text-xs font-bold text-slate-300 uppercase tracking-wide mb-1.5">Nama Panitia</label>
+                    <input type="text" id="edit_form_nama_panitia" required class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2.5 text-white font-medium text-sm">
+                </div>
+                <div>
+                    <label class="block text-xs font-bold text-slate-300 uppercase tracking-wide mb-1.5">Nomor WhatsApp Aktif</label>
+                    <input type="text" id="edit_form_nomor_wa" required class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2.5 text-white font-medium text-sm">
+                </div>
+                <div>
+                    <label class="block text-xs font-bold text-slate-300 uppercase tracking-wide mb-1.5">Ganti Sandi Akses (Kosongkan jika tetap)</label>
+                    <input type="password" id="edit_form_password" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2.5 text-white font-medium text-sm" placeholder="Masukkan kata sandi baru untuk overwrite...">
+                </div>
+                <div class="pt-3 flex gap-3">
+                    <button type="button" onclick="closeEditModal()" class="w-1/2 bg-slate-800 text-white py-2.5 rounded-xl font-bold text-sm">Batal</button>
+                    <button type="submit" class="w-1/2 bg-amber-500 text-white py-2.5 rounded-xl font-bold text-sm shadow-md">Simpan Perubahan</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- MODAL DETAIL KARTU IDENTITAS -->
+    <div id="detail_admin_modal" class="hidden fixed inset-0 bg-slate-950/90 backdrop-blur-lg z-50 flex items-center justify-center p-4">
+        <div class="bg-slate-900 border border-slate-800 w-full max-w-sm rounded-2xl shadow-2xl overflow-hidden">
+            <div class="p-4 border-b border-slate-800 bg-slate-950/40 flex justify-between items-center">
+                <h3 class="text-base font-bold text-white"><i class="bi bi-person-badge-fill text-indigo-400"></i> Kartu Identitas Panitia</h3>
+                <button onclick="closeDetailModal()" class="text-slate-400 hover:text-white text-xl"><i class="bi bi-x-lg"></i></button>
+            </div>
+            <div class="p-5 flex flex-col items-center text-center space-y-4">
+                <div class="w-36 h-36 rounded-xl overflow-hidden bg-slate-950 border-2 border-slate-800 shadow-xl flex items-center justify-center">
+                    <img id="detail_avatar" src="" alt="Foto" class="w-full h-full object-cover hidden">
+                    <div id="detail_avatar_placeholder" class="text-slate-600 text-5xl"><i class="bi bi-person-bounding-box"></i></div>
+                </div>
+                <div class="w-full space-y-1">
+                    <h2 id="detail_nama" class="text-lg font-black text-white tracking-tight">Nama Lengkap</h2>
+                    <p id="detail_username" class="text-indigo-400 font-mono text-sm font-bold">@username</p>
+                    <span id="detail_badge_status" class="inline-block mt-0.5"></span>
+                </div>
+                <div class="w-full border-t border-slate-800 pt-3 text-left space-y-2 font-medium text-sm">
+                    <div class="flex justify-between border-b border-slate-800/40 pb-1.5"><span class="text-slate-400">Tahun Jabatan:</span><span id="detail_tahun_menjabat" class="text-amber-400 font-bold">2026</span></div>
+                    <div class="flex justify-between border-b border-slate-800/40 pb-1.5"><span class="text-slate-400">No WhatsApp:</span><span id="detail_wa" class="text-emerald-400 font-mono">0812345</span></div>
+                    <div class="flex justify-between"><span class="text-slate-400">Kondisi Arsip:</span><span id="detail_arsip_status" class="text-white font-bold">-</span></div>
+                </div>
+                <button onclick="closeDetailModal()" class="w-full bg-slate-800 text-white font-bold py-2 rounded-xl text-sm">Tutup Detail</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let fullAdminList = []; 
+        let currentActiveTab = 'aktif'; 
+        let searchQuery = '';
+
+        document.addEventListener('DOMContentLoaded', () => { 
+            document.getElementById('form_tahun_menjabat').value = new Date().getFullYear(); 
+            loadAdminData(); 
+        });
+
+        function switchTab(targetTab) {
+            currentActiveTab = targetTab; 
+            const tabAktif = document.getElementById('tab_aktif'); 
+            const tabArsip = document.getElementById('tab_arsip'); 
+            const tableTitle = document.getElementById('table_title'); 
+            const tahunWrapper = document.getElementById('tahun_filter_wrapper');
+            
+            if (targetTab === 'aktif') {
+                tabAktif.className = "px-4 py-2.5 border-b-2 border-indigo-600 text-white font-bold text-sm tracking-wide flex items-center gap-1.5 transition-all"; 
+                tabArsip.className = "px-4 py-2.5 border-b-2 border-transparent text-slate-400 hover:text-white font-bold text-sm tracking-wide flex items-center gap-1.5 transition-all"; 
+                tableTitle.innerText = "Daftar Akun Panitia TPS Aktif"; 
+                tahunWrapper.style.display = 'none';
+            } else {
+                tabAktif.className = "px-4 py-2.5 border-b-2 border-transparent text-slate-400 hover:text-white font-bold text-sm tracking-wide flex items-center gap-1.5 transition-all"; 
+                tabArsip.className = "px-4 py-2.5 border-b-2 border-amber-500 text-white font-bold text-sm tracking-wide flex items-center gap-1.5 transition-all"; 
+                tableTitle.innerText = "Gudang Arsip Eks-Panitia Tahunan"; 
+                tahunWrapper.style.display = 'flex'; 
+                buildTahunDropdownOptions();
+            }
+            renderTableData();
+        }
+
+        async function loadAdminData() {
+            try {
+                const response = await fetch('/api/superadmin/admin');
+                if (response.status === 401 || response.status === 403) {
+                    document.getElementById('admin_table_body').innerHTML = `<tr><td colspan="6" class="p-8 text-center text-red-400 font-bold text-lg">Akses Ditolak! Anda tidak diizinkan.</td></tr>`; 
+                    return;
+                }
+                const result = await response.json();
+                if (result.status === "success") {
+                    fullAdminList = result.data.map(admin => { 
+                        if (admin.is_archived == 1 && !admin.tahun_arsip) { 
+                            admin.tahun_arsip = admin.tahun_menjabat || new Date().getFullYear(); 
+                        } 
+                        return admin; 
+                    });
+                    if (currentActiveTab === 'arsip') buildTahunDropdownOptions();
+                    renderTableData();
+                }
+            } catch (error) { 
+                console.error("Gagal memproses muatan data panitia via AJAX:", error); 
+            }
+        }
+
+        function buildTahunDropdownOptions() {
+            const selectDropdown = document.getElementById('filter_tahun_select');
+            const listTahun = [...new Set(fullAdminList.filter(admin => admin.is_archived == 1 && admin.tahun_arsip).map(admin => admin.tahun_arsip))].sort((a, b) => b - a);
+            selectDropdown.innerHTML = '<option value="ALL">Semua Tahun</option>';
+            listTahun.forEach(tahun => { 
+                const opt = document.createElement('option'); 
+                opt.value = tahun; 
+                opt.innerText = `Tahun Akses ${tahun}`; 
+                selectDropdown.appendChild(opt); 
+            });
+        }
+
+        function handleLiveSearch() { 
+            searchQuery = document.getElementById('live_search_input').value.toLowerCase().trim(); 
+            renderTableData(); 
+        }
+
+        function renderTableData() {
+            const targetStatusIsArchived = (currentActiveTab === 'arsip') ? 1 : 0; 
+            const filterTahunPilihan = document.getElementById('filter_tahun_select').value;
+            
+            const filteredAdmins = fullAdminList.filter(admin => {
+                const statusArsip = (admin.is_archived === null || admin.is_archived === undefined) ? 0 : parseInt(admin.is_archived); 
+                if (statusArsip !== targetStatusIsArchived) return false;
+                
+                if (targetStatusIsArchived === 1 && filterTahunPilihan !== 'ALL') { 
+                    if (String(admin.tahun_arsip) !== filterTahunPilihan) return false; 
+                }
+                
+                if (searchQuery !== '') {
+                    const matchUsername = String(admin.username).toLowerCase().includes(searchQuery); 
+                    const textNama = admin.nama_panitia ? String(admin.nama_panitia).toLowerCase() : '';
+                    if (!matchUsername && !textNama.includes(searchQuery)) return false;
+                }
+                return true;
+            });
+
+            document.getElementById('admin_count').innerText = `${filteredAdmins.length} Terdata`; 
+            const tbody = document.getElementById('admin_table_body');
+            
+            if (filteredAdmins.length === 0) { 
+                tbody.innerHTML = `<tr><td colspan="6" class="p-8 text-center text-slate-500 font-bold text-sm">Tidak ada data rekam panitia KPO yang cocok.</td></tr>`; 
+                return; 
+            }
+
+            // FILTER DOWNSIZE CETAK BARIS: Mengurangi ukuran text padding, ikon, dan tombol opsi operasi
+            tbody.innerHTML = filteredAdmins.map(admin => {
+                const waValue = admin.nomor_wa || ''; 
+                const isBlocked = parseInt(admin.is_blocked || 0); 
+                const isArchived = parseInt(admin.is_archived || 0);
+                
+                const statusBadge = isBlocked === 1 
+                    ? `<span class="bg-red-500/10 text-red-400 border border-red-500/20 px-2.5 py-0.5 rounded text-xs font-bold uppercase"><i class="bi bi-lock-fill"></i> Dicekal</span>` 
+                    : `<span class="bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 px-2.5 py-0.5 rounded text-xs font-bold uppercase"><i class="bi bi-shield-fill-check"></i> Aktif</span>`;
+                
+                const blockButton = isBlocked === 1 
+                    ? `<button onclick="toggleBlockStatus(${admin.id}, 0, '${admin.nama_panitia}')" class="bg-emerald-600/10 text-emerald-400 px-2.5 py-1.5 rounded-lg border border-emerald-600/20 hover:bg-emerald-600 hover:text-white transition-all flex items-center justify-center cursor-pointer" title="Buka Cekal"><i class="bi bi-unlock-fill text-xs"></i></button>` 
+                    : `<button onclick="toggleBlockStatus(${admin.id}, 1, '${admin.nama_panitia}')" class="bg-red-600/10 text-red-400 px-2.5 py-1.5 rounded-lg border border-red-600/20 hover:bg-red-500 hover:text-white transition-all flex items-center justify-center cursor-pointer" title="Cekal Akses"><i class="bi bi-lock-fill text-xs"></i></button>`;
+                
+                const archiveButton = isArchived === 1 
+                    ? `<button onclick="toggleArchiveStatus(${admin.id}, 0, '${admin.nama_panitia}')" class="bg-indigo-600/10 text-indigo-400 px-3 py-1.5 rounded-lg border border-indigo-500/20 font-bold text-xs hover:bg-indigo-600 hover:text-white transition-all">Aktifkan Kembali</button>` 
+                    : `<button onclick="toggleArchiveStatus(${admin.id}, 1, '${admin.nama_panitia}')" class="bg-amber-600/10 text-amber-400 px-3 py-1.5 rounded-lg border border-amber-500/20 font-bold text-xs hover:bg-amber-500 hover:text-white transition-all">Demisionerkan</button>`;
+                
+                return `
+                <tr class="hover:bg-slate-900/30 transition-colors">
+                    <td class="p-4 text-center font-mono text-indigo-400 font-bold text-sm">${admin.id}</td>
+                    <td class="p-4 font-bold text-white text-sm">
+                        <button onclick="openDetailModal(${admin.id})" class="text-indigo-400 font-bold hover:underline">${admin.username}</button>
+                    </td>
+                    <td class="p-4 text-sm font-semibold">${admin.nama_panitia}</td> 
+                    <td class="p-4 font-mono text-sm text-emerald-400">+62 ${waValue}</td>
+                    <td class="p-4 text-center">${statusBadge}</td>
+                    <td class="p-4">
+                        <div class="flex items-center justify-center gap-1.5 w-full">
+                            <button onclick="sendResetLinkViaFonnte('${waValue}', '${admin.nama_panitia}', '${admin.username}')" class="bg-indigo-600/10 text-indigo-400 px-2.5 py-1.5 rounded-lg border border-indigo-600/20 hover:bg-indigo-600 hover:text-white transition-all flex items-center justify-center cursor-pointer" title="Kirim Tautan WhatsApp">
+                                <i class="bi bi-whatsapp text-xs"></i>
+                            </button>
+                            <button onclick="openEditModal(${admin.id}, '${admin.nama_panitia}', '${waValue}')" class="bg-amber-600/10 text-amber-400 px-2.5 py-1.5 rounded-lg border border-amber-500/20 hover:bg-amber-500 hover:text-white transition-all flex items-center justify-center cursor-pointer" title="Ubah Data">
+                                <i class="bi bi-pencil-square text-xs"></i>
+                            </button>
+                            ${blockButton} 
+                            ${archiveButton}
+                            <button onclick="deleteAdmin(${admin.id}, '${admin.nama_panitia}')" class="bg-red-600/10 text-red-400 px-2.5 py-1.5 rounded-lg border border-red-600/20 hover:bg-red-500 hover:text-white transition-all flex items-center justify-center cursor-pointer" title="Hapus Akun">
+                                <i class="bi bi-person-x-fill text-xs"></i>
+                            </button>
+                        </div>
+                    </td>
+                </tr>`;
+            }).join('');
+        }
+
+        function openDetailModal(adminId) {
+            const admin = fullAdminList.find(a => a.id == adminId); 
+            if (!admin) return;
+            
+            document.getElementById('detail_nama').innerText = admin.nama_panitia; 
+            document.getElementById('detail_username').innerText = `@${admin.username}`;
+            document.getElementById('detail_tahun_menjabat').innerText = admin.tahun_menjabat || '2026'; 
+            document.getElementById('detail_wa').innerText = `+62 ${admin.nomor_wa}`;
+            
+            const badge = document.getElementById('detail_badge_status'); 
+            badge.innerHTML = admin.is_blocked == 1 
+                ? `<span class="bg-red-500/20 text-red-400 px-2.5 py-0.5 rounded-full text-[10px] font-bold">TERCEKAL</span>` 
+                : `<span class="bg-emerald-500/20 text-emerald-400 px-2.5 py-0.5 rounded-full text-[10px] font-bold">PANITIA AKTIF</span>`;
+            
+            document.getElementById('detail_arsip_status').innerHTML = admin.is_archived == 1 
+                ? `<span class="text-amber-400 font-bold">Demisioner (${admin.tahun_arsip})</span>` 
+                : `<span class="text-indigo-400 font-bold">Aktif TPS</span>`;
+            
+            const imgEl = document.getElementById('detail_avatar'); 
+            const placeholderEl = document.getElementById('detail_avatar_placeholder');
+            
+            if (admin.foto) { 
+                imgEl.src = `/static/uploads/admin/${admin.foto}`; 
+                imgEl.classList.remove('hidden'); 
+                placeholderEl.classList.add('hidden'); 
+            } else { 
+                imgEl.classList.add('hidden'); 
+                placeholderEl.classList.remove('hidden'); 
+            }
+            document.getElementById('detail_admin_modal').classList.remove('hidden');
+        }
+
+        function closeDetailModal() { document.getElementById('detail_admin_modal').classList.add('hidden'); }
+
+        async function sendResetLinkViaFonnte(nomorWa, namaLengkap, username) {
+            if (!nomorWa) return Swal.fire('WhatsApp Kosong', 'Nomor tidak valid.', 'warning');
+            
+            Swal.fire({
+                title: 'Memproses Tautan...',
+                text: 'Mengirimkan notifikasi kredensial via WhatsApp Gateway',
+                allowOutsideClick: false,
+                didOpen: () => Swal.showLoading()
+            });
+
+            try {
+                const response = await fetch('/api/superadmin/admin/send-reset-wa', { 
+                    method: 'POST', 
+                    headers: { 'Content-Type': 'application/json' }, 
+                    body: JSON.stringify({ nomor_wa: nomorWa, nama_lengkap: namaLengkap, username: username }) 
+                });
+                const result = await response.json(); 
+                Swal.close();
+                if (response.ok) {
+                    Swal.fire('Terkirim!', result.message, 'success');
+                } else {
+                    Swal.fire('Gagal Kirim', result.message || 'Terjadi kesalahan sistem.', 'error');
+                }
+            } catch { 
+                Swal.close();
+                Swal.fire('Error', 'Gagal memproses tautan pengiriman OTP.', 'error'); 
+            }
+        }
+
+        async function toggleBlockStatus(id, blockVal, name) {
+            try {
+                const response = await fetch(`/api/superadmin/admin/toggle-block/${id}`, { 
+                    method: 'POST', 
+                    headers: { 'Content-Type': 'application/json' }, 
+                    body: JSON.stringify({ is_blocked: blockVal }) 
+                });
+                if (response.ok) { 
+                    Swal.fire('Sukses!', 'Status keamanan hak akses panel diperbarui.', 'success'); 
+                    loadAdminData(); 
+                }
+            } catch { 
+                Swal.fire('Error', 'Gagal memproses perubahan cekal database.', 'error'); 
+            }
+        }
+
+        async function toggleArchiveStatus(id, archiveVal, name) {
+            try {
+                const response = await fetch(`/api/superadmin/admin/toggle-archive/${id}`, { 
+                    method: 'POST', 
+                    headers: { 'Content-Type': 'application/json' }, 
+                    body: JSON.stringify({ is_archived: archiveVal }) 
+                });
+                if (response.ok) { 
+                    Swal.fire('Berhasil!', 'Status kearsipan panitia tahunan disesuaikan.', 'success'); 
+                    loadAdminData(); 
+                }
+            } catch { 
+                Swal.fire('Error', 'Gagal menyelaraskan arsip.', 'error'); 
+            }
+        }
+
+        async function submitAdminForm(e) {
+            e.preventDefault(); 
+            const formData = new FormData();
+            formData.append('username', document.getElementById('form_username').value.trim()); 
+            formData.append('nama_panitia', document.getElementById('form_nama_panitia').value.trim());
+            formData.append('nomor_wa', document.getElementById('form_nomor_wa').value.trim()); 
+            formData.append('tahun_menjabat', document.getElementById('form_tahun_menjabat').value);
+            formData.append('password', document.getElementById('form_password').value); 
+            
+            const fileInput = document.getElementById('form_foto'); 
+            if (fileInput.files.length > 0) formData.append('foto', fileInput.files[0]);
+            
+            try {
+                const response = await fetch('/api/superadmin/admin', { method: 'POST', body: formData }); 
+                const res = await response.json();
+                if (response.ok) { 
+                    Swal.fire('Berhasil!', res.message, 'success'); 
+                    closeAddModal(); 
+                    loadAdminData(); 
+                } else { 
+                    Swal.fire('Gagal Mendaftar', res.message, 'error'); 
+                }
+            } catch { 
+                Swal.fire('Error', 'Masalah koneksi database server.', 'error'); 
+            }
+        }
+
+        function openEditModal(id, nama, wa) { 
+            document.getElementById('edit_form_id').value = id; 
+            document.getElementById('edit_form_nama_panitia').value = nama; 
+            document.getElementById('edit_form_nomor_wa').value = wa; 
+            document.getElementById('edit_form_password').value = ""; 
+            document.getElementById('edit_admin_modal').classList.remove('hidden'); 
+        }
+        
+        function closeEditModal() { document.getElementById('edit_admin_modal').classList.add('hidden'); }
+
+        async function submitEditForm(e) {
+            e.preventDefault(); 
+            const id = document.getElementById('edit_form_id').value; 
+            const nama_panitia = document.getElementById('edit_form_nama_panitia').value.trim(); 
+            const nomor_wa = document.getElementById('edit_form_nomor_wa').value.trim(); 
+            const password = document.getElementById('edit_form_password').value;
+            
+            try {
+                const response = await fetch(`/api/superadmin/admin/update/${id}`, { 
+                    method: 'POST', 
+                    headers: { 'Content-Type': 'application/json' }, 
+                    body: JSON.stringify({ nama_panitia, nomor_wa, password }) 
+                });
+                const result = await response.json(); 
+                if (response.ok) { 
+                    Swal.fire('Berhasil!', result.message, 'success'); 
+                    closeEditModal(); 
+                    loadAdminData(); 
+                }
+            } catch { 
+                Swal.fire('Error', 'Gagal memproses pembaruan data operator.', 'error'); 
+            }
+        }
+
+        function deleteAdmin(id, name) {
+            Swal.fire({ 
+                title: 'Copot & Hapus Panitia?', 
+                text: `Apakah Anda yakin ingin menghapus akses KPO "${name}" secara permanen dari server?`, 
+                icon: 'warning', 
+                showCancelButton: true, 
+                confirmButtonColor: '#ef4444',
+                cancelButtonColor: '#64748b',
+                confirmButtonText: 'Ya, Hapus Permanen!'
+            }).then(async (result) => {
+                if (result.isConfirmed) {
+                    try {
+                        const response = await fetch(`/api/superadmin/admin/${id}`, { method: 'DELETE' }); 
+                        const res = await response.json();
+                        if (response.ok) { 
+                            Swal.fire('Terhapus!', res.message, 'success'); 
+                            loadAdminData(); 
+                        }
+                    } catch { 
+                        Swal.fire('Error', 'Koneksi ke server terputus.', 'error'); 
+                    }
+                }
+            });
+        }
+
+        function openAddModal() { 
+            document.getElementById('add_admin_modal').classList.remove('hidden'); 
+            document.getElementById('add_admin_form').reset(); 
+            document.getElementById('form_tahun_menjabat').value = new Date().getFullYear(); 
+        }
+        function closeAddModal() { document.getElementById('add_admin_modal').classList.add('hidden'); }
+        function handleLogout() { fetch('/api/logout', { method: 'POST' }).then(() => location.href = '/auth/login'); }
+    </script>
+</body>
+</html>

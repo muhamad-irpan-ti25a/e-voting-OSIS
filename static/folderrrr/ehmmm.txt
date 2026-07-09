@@ -1,0 +1,2 @@
+npx tailwindcss -i ./static/css/input.css -o ./static/css/style.css --watch
+UPDATE users SET is_alumni = 0, is_archived = 0;

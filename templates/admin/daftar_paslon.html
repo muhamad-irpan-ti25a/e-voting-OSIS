@@ -1,0 +1,439 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Panitia - Daftar Kandidat Paslon</title>
+    <link rel="stylesheet" href="/static/css/style.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800;900&family=JetBrains+Mono:wght@700&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <style>
+        body { font-family: 'Inter', sans-serif; }
+        .font-mono-kpu { font-family: 'JetBrains Mono', monospace; }
+
+        /* SPOTIFY TWIN-PANEL WRAPPER (SKALA NORMAL) */
+        .spotify-wrapper {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 24px;
+            align-items: stretch; 
+        }
+        @media (min-width: 1280px) {
+            .spotify-wrapper {
+                grid-template-columns: 45fr 55fr;
+            }
+        }
+
+        .about-artist-box {
+            background-size: cover;
+            background-position: center;
+            border-radius: 16px;
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            padding: 24px;
+            border: 1px solid #1e293b;
+            min-height: 420px;
+        }
+
+        .spotify-panel-dark {
+            background-color: #0f172a; 
+            border-radius: 16px;
+            padding: 24px;
+            border: 1px solid #1e293b;
+        }
+
+        .clean-scroll::-webkit-scrollbar { 
+            width: 6px; 
+        }
+        .clean-scroll::-webkit-scrollbar-track {
+            background: transparent;
+        }
+        .clean-scroll::-webkit-scrollbar-thumb { 
+            background: #334155; 
+            border-radius: 10px; 
+        }
+    </style>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-slate-950 text-slate-100 min-h-screen flex">
+
+    <!-- SIDEBAR NAVIGASI STANDARD -->
+    <aside class="w-72 bg-slate-900/70 backdrop-blur-xl border-r border-slate-800 flex flex-col justify-between sticky top-0 h-screen z-50 flex-shrink-0">
+        <div class="p-5">
+            <div class="flex items-center gap-3 pb-5 border-b border-slate-800">
+                <div class="bg-indigo-600 p-2.5 rounded-lg text-white shadow-md flex items-center justify-center">
+                    <i class="bi bi-shield-check text-2xl"></i>
+                </div>
+                <div>
+                    <h2 class="font-black text-xl tracking-tight text-white leading-none">E-Vote OSIS</h2>
+                    <span class="text-xs bg-slate-800 text-slate-400 px-2.5 py-1 rounded-full font-bold block mt-1.5 w-max uppercase">PANITIA DPT</span>
+                </div>
+            </div>
+            
+            <nav class="mt-6 space-y-2">
+                <a href="/admin/dashboard" class="flex items-center gap-4 px-4 py-3 text-slate-400 hover:text-white hover:bg-slate-900/60 rounded-xl font-bold transition-colors">
+                    <i class="bi bi-grid-1x2 text-xl text-slate-500"></i> 
+                    <span class="text-base tracking-wide">Dashboard Live</span>
+                </a>
+                <a href="/admin/daftar-paslon" class="flex items-center gap-4 px-4 py-3 bg-indigo-600 text-white rounded-xl font-bold shadow-md transition-colors">
+                    <i class="bi bi-card-list text-xl"></i> 
+                    <span class="text-base tracking-wide">Daftar Paslon</span>
+                </a>
+                <a href="/admin/data-pemilih" class="flex items-center gap-4 px-4 py-3 text-slate-400 hover:text-white hover:bg-slate-900/60 rounded-xl font-bold transition-colors">
+                    <i class="bi bi-person-lines-fill text-xl text-slate-500"></i> 
+                    <span class="text-base tracking-wide">Master DPT</span>
+                </a>
+                <a href="/admin/quick-count" class="flex items-center gap-4 px-4 py-3 text-slate-400 hover:text-white hover:bg-slate-900/60 rounded-xl font-bold transition-colors">
+                    <i class="bi bi-pie-chart text-xl text-slate-500"></i> 
+                    <span class="text-base tracking-wide">Quick Count Live</span>
+                </a>
+            </nav>
+        </div>
+
+        <div class="p-5 border-t border-slate-800 bg-slate-950/40">
+            <div class="flex items-center gap-3 mb-4 px-1">
+                <div class="w-10 h-10 rounded-full bg-indigo-600 flex items-center justify-center border border-indigo-400 flex-shrink-0">
+                    <i class="bi bi-person-badge-fill text-white text-xl"></i>
+                </div>
+                <div class="truncate flex-1">
+                    <h4 class="text-sm font-black text-white truncate leading-tight">{{ session.get('nama_lengkap', 'Operator TPS') }}</h4>
+                    <span class="text-xs font-mono-kpu font-semibold text-slate-400 block mt-0.5 truncate">ID: {{ session.get('username', 'PANITIA_KPO') }}</span>
+                    <span class="text-[10px] text-emerald-400 block font-bold mt-0.5 uppercase tracking-wide">● Wilayah TPS Active</span>
+                </div>
+            </div>
+            <button onclick="handleLogout()" class="w-full flex items-center justify-center gap-2 px-4 py-3 bg-red-500/10 hover:bg-red-500 text-red-400 hover:text-white rounded-xl text-sm font-bold border border-red-500/10 hover:border-transparent transition-all">
+                <i class="bi bi-box-arrow-left text-lg"></i> Keluar Sistem
+            </button>
+        </div>
+    </aside>
+
+    <!-- MAIN CONTENT INDUK -->
+    <main class="flex-1 p-6 lg:p-8 space-y-8 overflow-y-auto max-w-[calc(100vw-18rem)]">
+        <header class="pb-4 border-b border-slate-800">
+            <h1 class="text-3xl font-black text-white tracking-tight">Kandidat Paslon OSIS</h1>
+            <p class="text-slate-400 text-base font-medium mt-1">Informasi profil resmi, visi, misi, dan perolehan suara kandidat (Mode Akses Koreksi Panitia).</p>
+        </header>
+
+        <!-- CONTAINER UTAMA SPOTIFY LAYOUT -->
+        <div id="paslon_grid_container" class="space-y-12 w-full">
+            <div class="text-center py-12 text-lg text-slate-500 font-bold">
+                Memuat data profil kandidat...
+            </div>
+        </div>
+    </main>
+
+    <!-- MODAL DETAIL PROFIL LENGKAP -->
+    <div id="detail_paslon_modal" class="hidden fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-4 overflow-y-auto">
+        <div class="bg-slate-900 border border-slate-800 w-full max-w-2xl rounded-2xl shadow-2xl overflow-hidden my-auto">
+            <div class="p-4 border-b border-slate-800 bg-black/20 flex justify-between items-center">
+                <h3 class="text-sm font-black text-indigo-400 tracking-wider uppercase"><i class="bi bi-fingerprint"></i> Profil Lengkap</h3>
+                <button onclick="closeDetailPaslonModal()" class="text-slate-400 hover:text-white text-xl"><i class="bi bi-x-lg"></i></button>
+            </div>
+            <div class="p-5 space-y-5 max-h-[75vh] overflow-y-auto">
+                <div class="grid grid-cols-1 sm:grid-cols-5 gap-4">
+                    <div class="sm:col-span-2 h-48 bg-black border border-slate-800 rounded-xl overflow-hidden">
+                        <img id="detail_foto" src="" alt="Foto Resmi" class="w-full h-full object-cover">
+                    </div>
+                    <div class="sm:col-span-3 flex flex-col justify-center space-y-3">
+                        <div><span class="text-[10px] bg-indigo-600 text-white font-black px-3 py-1 rounded-full uppercase tracking-wider">NO. URUT <span id="detail_nomor">0</span></span></div>
+                        <h2 id="detail_nama" class="text-xl font-black text-white leading-tight">Nama Kontestan</h2>
+                        <p id="detail_kelas_info" class="text-xs font-bold text-gray-400 bg-slate-950 w-max px-2.5 py-1 rounded-md"></p>
+                        <div class="text-sm font-bold text-gray-300">Suara Sementara: <span id="detail_suara" class="text-lg font-black text-indigo-400 font-mono ml-1">0</span> Suara Sah</div>
+                    </div>
+                </div>
+                <div class="space-y-4 border-t border-slate-800 pt-4">
+                    <div>
+                        <h4 class="text-xs font-black text-slate-400 uppercase tracking-widest mb-1.5"><i class="bi bi-eye-fill text-indigo-400"></i> Visi</h4>
+                        <p id="detail_visi" class="text-base font-medium text-white bg-black/20 p-3 border border-white/5 rounded-xl leading-relaxed italic"></p>
+                    </div>
+                    <div>
+                        <h4 class="text-xs font-black text-slate-400 uppercase tracking-widest mb-1.5"><i class="bi bi-list-check text-violet-400"></i> Misi Kerja</h4>
+                        <div id="detail_misi_container" class="text-sm font-medium text-gray-300 bg-black/20 p-3 border border-white/5 rounded-xl leading-relaxed"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL EDIT DATA KHUSUS KOREKSI -->
+    <div id="paslon_modal" class="hidden fixed inset-0 bg-slate-950/80 backdrop-blur-md z-50 flex items-center justify-center p-4">
+        <div class="bg-slate-900 border border-slate-800 w-full max-w-xl rounded-2xl shadow-2xl overflow-hidden">
+            <div class="p-5 border-b border-slate-800 bg-slate-950/40 flex justify-between items-center">
+                <h3 id="form_modal_title" class="text-lg font-black text-white">Form Koreksi Paslon</h3>
+                <button onclick="closePaslonModal()" class="text-slate-400 hover:text-white text-xl"><i class="bi bi-x-lg"></i></button>
+            </div>
+            <form id="paslon_form" onsubmit="submitPaslonForm(event)" class="p-5 space-y-3">
+                <input type="hidden" id="form_id">
+                <div class="grid grid-cols-2 gap-3">
+                    <div>
+                        <label class="block text-xs font-bold text-slate-400 uppercase mb-1">Nama Ketua</label>
+                        <input type="text" id="form_nama_ketua" required class="w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-2 text-white font-semibold text-sm focus:border-indigo-500 focus:outline-none">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-bold text-slate-400 uppercase mb-1">Kelas Ketua</label>
+                        <input type="text" id="form_kelas_ketua" required class="w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-2 text-white font-semibold text-sm focus:border-indigo-500 focus:outline-none">
+                    </div>
+                </div>
+                <div class="grid grid-cols-2 gap-3">
+                    <div>
+                        <label class="block text-xs font-bold text-slate-400 uppercase mb-1">Nama Wakil</label>
+                        <input type="text" id="form_nama_wakil" required class="w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-2 text-white font-semibold text-sm focus:border-indigo-500 focus:outline-none">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-bold text-slate-400 uppercase mb-1">Kelas Wakil</label>
+                        <input type="text" id="form_kelas_wakil" required class="w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-2 text-white font-semibold text-sm focus:border-indigo-500 focus:outline-none">
+                    </div>
+                </div>
+                <div>
+                    <label class="block text-xs font-bold text-slate-400 uppercase mb-1">Visi</label>
+                    <textarea id="form_visi" required rows="2" class="w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-2 text-white font-semibold text-sm focus:border-indigo-500 focus:outline-none"></textarea>
+                </div>
+                <div>
+                    <label class="block text-xs font-bold text-slate-400 uppercase mb-1">Misi</label>
+                    <textarea id="form_misi" required rows="3" class="w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-2 text-white font-semibold text-sm focus:border-indigo-500 focus:outline-none"></textarea>
+                </div>
+                <div class="pt-3 flex gap-3">
+                    <button type="button" onclick="closePaslonModal()" class="w-1/2 bg-slate-800 hover:bg-slate-700 text-white py-2.5 rounded-lg font-bold text-sm">Batal</button>
+                    <button type="submit" class="w-1/2 bg-indigo-600 hover:bg-indigo-500 text-white py-2.5 rounded-lg font-bold text-sm shadow-md">Simpan Perubahan</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- ENGINE JAVASCRIPT CONTROLLER -->
+    <script>
+        let cachedPaslonList = [];
+
+        document.addEventListener('DOMContentLoaded', loadPaslonData);
+
+        async function loadPaslonData() {
+            try {
+                const response = await fetch('/api/superadmin/dashboard-stats');
+                const result = await response.json();
+                if (result.status === "success") {
+                    cachedPaslonList = result.data.paslon_votes;
+                    const paslonAktif = cachedPaslonList.filter(p => !p.is_archived || p.is_archived == 0);
+                    renderPaslonGrid(paslonAktif);
+                }
+            } catch {
+                Swal.fire('Error', 'Gagal memuat profil paslon dari server.', 'error');
+            }
+        }
+
+        // RENDER METHOD DENGAN SCALE NORMAL 100% MONITOR
+        function renderPaslonGrid(paslonList) {
+            const container = document.getElementById('paslon_grid_container');
+            if (paslonList.length === 0) {
+                container.innerHTML = `<div class="text-center py-12 text-xl text-slate-500 font-bold">Tidak ada kandidat paslon aktif saat ini.</div>`;
+                return;
+            }
+
+            container.innerHTML = paslonList.map((paslon) => {
+                const fotoUrl = paslon.foto ? `/static/uploads/${paslon.foto}` : '/static/uploads/default.png'; 
+                
+                let listMisiHtml = '';
+                const barisMisi = paslon.misi ? paslon.misi.split('\n') : [];
+                let indexMisi = 1;
+
+                barisMisi.forEach(misi => {
+                    if (misi.trim() !== '') {
+                        const teksBersih = misi.trim().replace(/^\d+[\s.]?/, '').trim();
+                        listMisiHtml += `
+                            <div class="flex items-start gap-3">
+                                <span class="text-base font-black text-indigo-400 min-w-[18px]">${indexMisi}</span>
+                                <p class="text-sm font-bold text-slate-100 leading-normal tracking-wide">${teksBersih}</p>
+                            </div>
+                        `;
+                        indexMisi++;
+                    }
+                });
+
+                if (listMisiHtml === '') {
+                    listMisiHtml = `<p class="text-xs text-slate-500 italic">Belum ada rincian misi kerja.</p>`;
+                }
+
+                const safeVisi = paslon.visi || 'Belum mengunggah visi strategis.';
+                
+                return `
+                    <div class="spotify-wrapper mb-8">
+                        <!-- PANEL KIRI PROFILE -->
+                        <div class="about-artist-box shadow-lg" style="background-image: linear-gradient(rgba(0,0,0,0) 25%, rgba(2, 6, 23, 0.98) 80%), url('${fotoUrl}');">
+                            <div class="text-xs font-black tracking-widest text-slate-400 uppercase">About the paslon</div>
+                            
+                            <div class="space-y-4 w-full">
+                                <div class="flex justify-between items-end gap-3">
+                                    <div>
+                                        <h2 class="text-3xl font-black text-white tracking-tight leading-none">PASLON ${paslon.nomor_urut}</h2>
+                                        <p class="text-[10px] text-indigo-400 font-black tracking-wider mt-2 uppercase"><i class="bi bi-shield-check"></i> Surat Suara Terverifikasi</p>
+                                    </div>
+                                    
+                                    <div class="flex flex-col items-center gap-1.5 bg-slate-950/60 p-2 rounded-xl border border-slate-800 shrink-0">
+                                        <span class="text-[9px] text-slate-400 font-bold tracking-wider uppercase">Operasi</span>
+                                        <div class="flex items-center gap-1.5">
+                                            <button onclick="viewPaslonDetail(${paslon.id})" class="bg-slate-900 hover:bg-slate-800 text-slate-200 px-2.5 py-1.5 rounded-lg text-xs font-bold"><i class="bi bi-eye text-indigo-400"></i></button>
+                                            <button onclick="openEditModal(${paslon.id})" class="bg-slate-900 hover:bg-indigo-600 text-white px-2.5 py-1.5 rounded-lg text-xs font-bold transition-colors"><i class="bi bi-pencil-square text-amber-400"></i></button>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <div class="pt-4 border-t border-slate-800/80 space-y-2">
+                                    <div class="flex justify-between items-center bg-slate-950/60 px-3 py-2.5 rounded-lg border border-slate-800">
+                                        <span class="text-slate-400 font-bold text-[10px] uppercase w-20">Ketua</span>
+                                        <span class="text-white font-black text-base truncate flex-1 px-2">${paslon.nama_ketua}</span>
+                                        <span class="text-xs font-mono font-bold text-indigo-400 bg-indigo-500/10 px-2 py-0.5 rounded border border-indigo-500/20">${paslon.kelas_ketua || '-'}</span>
+                                    </div>
+                                    <div class="flex justify-between items-center bg-slate-950/60 px-3 py-2.5 rounded-lg border border-slate-800">
+                                        <span class="text-slate-400 font-bold text-[10px] uppercase w-20">Wakil</span>
+                                        <span class="text-slate-200 font-black text-base truncate flex-1 px-2">${paslon.nama_wakil}</span>
+                                        <span class="text-xs font-mono font-bold text-violet-400 bg-violet-500/10 px-2 py-0.5 rounded border border-violet-500/20">${paslon.kelas_wakil || '-'}</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- PANEL KANAN VISI MISI -->
+                        <div class="flex flex-col gap-4 justify-between">
+                            <div class="spotify-panel-dark flex-1 flex flex-col justify-between">
+                                <div class="flex justify-between items-center mb-3">
+                                    <span class="text-xs font-black text-indigo-400 tracking-widest uppercase flex items-center gap-1.5">
+                                        <i class="bi bi-eye-fill"></i> Visi Utama
+                                    </span>
+                                    <div>
+                                        <span class="text-xs font-bold text-slate-400">Suara: <span class="text-lg font-black text-white font-mono-kpu bg-indigo-600/20 px-2.5 py-0.5 rounded-lg ml-1 border border-indigo-500/20">${paslon.total_suara}</span></span>
+                                    </div>
+                                </div>
+                                
+                                <div class="py-2">
+                                    <p class="text-lg font-bold text-white leading-relaxed italic tracking-wide">
+                                        "${safeVisi}"
+                                    </p>
+                                </div>
+                                <div class="text-[10px] text-slate-500 font-bold tracking-wider uppercase mt-4">Formulir Pokok Kebijakan Visi</div>
+                            </div>
+
+                            <div class="spotify-panel-dark h-[200px] flex flex-col justify-between">
+                                <div class="flex justify-between items-center mb-2.5">
+                                    <span class="text-xs font-black text-violet-400 tracking-widest uppercase flex items-center gap-1.5">
+                                        <i class="bi bi-list-check"></i> Misi Kerja & Program Utama
+                                    </span>
+                                    <span class="text-[10px] font-bold text-slate-500 tracking-wide">Open queue</span>
+                                </div>
+                                
+                                <div class="overflow-y-auto clean-scroll space-y-3 flex-1 pr-1 max-h-[130px]">
+                                    ${listMisiHtml}
+                                </div>
+                            </div>
+                        </div>
+                    </div>`;
+            }).join('');
+        }
+
+        function convertMisiToHtmlList(misiText) { 
+            if (!misiText || misiText.trim() === "") return '-'; 
+            const lines = misiText.split('\n').map(line => line.trim()).filter(line => line.length > 0); 
+            return `<ol class="list-decimal pl-4 space-y-1 text-sm text-gray-300">${lines.map(line => `<li>${line.replace(/^\d+[\s.]?/, '').trim()}</li>`).join('')}</ol>`; 
+        }
+
+        function viewPaslonDetail(id) {
+            const paslon = cachedPaslonList.find(p => p.id === id); 
+            if (!paslon) return;
+            
+            document.getElementById('detail_foto').src = paslon.foto ? `/static/uploads/${paslon.foto}` : '/static/uploads/default.png'; 
+            document.getElementById('detail_nomor').innerText = paslon.nomor_urut;
+            document.getElementById('detail_nama').innerHTML = `${paslon.nama_ketua} & ${paslon.nama_wakil}`; 
+            document.getElementById('detail_kelas_info').innerText = `Kelas Ketua: ${paslon.kelas_ketua || '-'} | Wakil: ${paslon.kelas_wakil || '-'}`;
+            document.getElementById('detail_suara').innerText = paslon.total_suara; 
+            document.getElementById('detail_visi').innerText = paslon.visi || '-';
+            
+            document.getElementById('detail_misi_container').innerHTML = convertMisiToHtmlList(paslon.misi); 
+            document.getElementById('detail_paslon_modal').classList.remove('hidden');
+        }
+
+        function openEditModal(id) {
+            const paslon = cachedPaslonList.find(p => p.id === id);
+            if (!paslon) return;
+
+            document.getElementById('form_id').value = paslon.id;
+            document.getElementById('form_nama_ketua').value = paslon.nama_ketua;
+            document.getElementById('form_kelas_ketua').value = paslon.kelas_ketua || '';
+            document.getElementById('form_nama_wakil').value = paslon.nama_wakil;
+            document.getElementById('form_kelas_wakil').value = paslon.kelas_wakil || '';
+            document.getElementById('form_visi').value = paslon.visi || '';
+            document.getElementById('form_misi').value = paslon.misi || '';
+
+            const formEl = document.getElementById('paslon_form');
+            formEl.setAttribute('data-nomor-urut', paslon.nomor_urut || '1');
+            formEl.setAttribute('data-tahun-pemilu', paslon.tahun_pemilu || 2026);
+
+            document.getElementById('paslon_modal').classList.remove('hidden');
+        }
+
+        function closePaslonModal() { document.getElementById('paslon_modal').classList.add('hidden'); }
+        function closeDetailPaslonModal() { document.getElementById('detail_paslon_modal').classList.add('hidden'); }
+
+        async function submitPaslonForm(e) {
+            e.preventDefault();
+            const idVal = document.getElementById('form_id').value;
+            const formEl = document.getElementById('paslon_form');
+            
+            const nomorUrutAsli = formEl.getAttribute('data-nomor-urut');
+            const tahunPemiluAsli = formEl.getAttribute('data-tahun-pemilu');
+            
+            const formData = new FormData();
+            formData.append('nomor_urut', nomorUrutAsli);
+            formData.append('tahun_pemilu', tahunPemiluAsli);
+            formData.append('nama_ketua', document.getElementById('form_nama_ketua').value);
+            formData.append('kelas_ketua', document.getElementById('form_kelas_ketua').value);
+            formData.append('nama_wakil', document.getElementById('form_nama_wakil').value);
+            formData.append('kelas_wakil', document.getElementById('form_kelas_wakil').value);
+            formData.append('visi', document.getElementById('form_visi').value);
+            formData.append('misi', document.getElementById('form_misi').value);
+
+            try {
+                const response = await fetch(`/api/admin/paslon/update/${idVal}`, {
+                    method: 'POST',
+                    body: formData
+                });
+                
+                if (response.ok) {
+                    Swal.fire({
+                        title: 'Sukses!',
+                        text: 'Koreksi data paslon berhasil disimpan oleh Panitia.',
+                        icon: 'success',
+                        background: '#0f172a',
+                        confirmButtonColor: '#4f46e5'
+                    });
+                    closePaslonModal();
+                    loadPaslonData();
+                } else {
+                    const errorData = await response.json();
+                    Swal.fire({
+                        title: 'Gagal Menyimpan',
+                        text: errorData.message || 'Terjadi kesalahan otorisasi data.',
+                        icon: 'error',
+                        background: '#0f172a',
+                        confirmButtonColor: '#4f46e5'
+                    });
+                }
+            } catch (err) {
+                Swal.fire({
+                    title: 'Error Gateway',
+                    text: 'Gagal terhubung ke server transmisi data.',
+                    icon: 'error',
+                    background: '#0f172a',
+                    confirmButtonColor: '#4f46e5'
+                });
+            }
+        }
+
+        function handleLogout() {
+            fetch('/api/logout', { method: 'POST' }).then(() => location.href = '/auth/login');
+        }
+    </script>
+</body>
+</html>

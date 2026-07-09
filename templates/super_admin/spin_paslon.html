@@ -1,0 +1,382 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Super Admin - Alat Kocok Nomor Urut Dinamis 30 Detik</title>
+    <link rel="stylesheet" href="/static/css/style.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800;900&family=JetBrains+Mono:wght@700&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <style>
+        body { font-family: 'Inter', sans-serif; }
+        .font-mono-kpu { font-family: 'JetBrains Mono', monospace; }
+        .spotify-panel-dark { background: #0f172a; border-radius: 20px; padding: 24px 28px; border: 1px solid #1e293b; }
+        input:disabled { opacity: 0.5; cursor: not-allowed; }
+        
+        .clean-scroll::-webkit-scrollbar { 
+            width: 6px; 
+        }
+        .clean-scroll::-webkit-scrollbar-track {
+            background: transparent;
+        }
+        .clean-scroll::-webkit-scrollbar-thumb { 
+            background: #1e293b; 
+            border-radius: 10px; 
+        }
+    </style>
+</head>
+<body class="bg-slate-950 text-slate-100 min-h-screen flex">
+
+    <aside class="w-72 bg-slate-900/70 backdrop-blur-xl border-r border-slate-800 flex flex-col justify-between sticky top-0 h-screen z-50 flex-shrink-0">
+        <div class="p-5">
+            <div class="flex items-center gap-3.5 pb-5 border-b border-slate-800">
+                <div class="bg-indigo-600 p-3 rounded-xl text-white shadow-lg flex items-center justify-center">
+                    <i class="bi bi-shield-check text-2xl"></i>
+                </div>
+                <div>
+                    <h2 class="font-black text-xl text-white leading-none">E-Vote OSIS</h2>
+                    <span class="text-[10px] bg-indigo-500/20 text-indigo-300 px-2.5 py-1 rounded-full font-black tracking-wider block mt-1.5 w-max">SUPER ADMIN</span>
+                </div>
+            </div>
+            <nav class="mt-8 space-y-2">
+                <a href="/superadmin/dashboard" class="flex items-center gap-3.5 px-4 py-3 text-slate-400 hover:text-white hover:bg-slate-900/60 rounded-xl font-bold transition-colors"><i class="bi bi-grid-1x2 text-xl text-slate-500"></i> <span class="text-sm tracking-wide">Dashboard Live</span></a>
+                <a href="/superadmin/manajemen-admin" class="flex items-center gap-3.5 px-4 py-3 text-slate-400 hover:text-white hover:bg-slate-900/60 rounded-xl font-bold transition-colors"><i class="bi bi-people text-xl text-slate-500"></i> <span class="text-sm tracking-wide">Panitia Admin</span></a>
+                <a href="/superadmin/manajemen-paslon" class="flex items-center gap-3.5 px-4 py-3 text-slate-400 hover:text-white hover:bg-slate-900/60 rounded-xl font-bold transition-colors"><i class="bi bi-person-vcard text-xl text-slate-500"></i> <span class="text-sm tracking-wide">Kandidat Paslon</span></a>
+                <a href="/superadmin/data-pemilih" class="flex items-center gap-3.5 px-4 py-3 text-slate-400 hover:text-white hover:bg-slate-900/60 rounded-xl font-bold transition-colors"><i class="bi bi-person-lines-fill text-xl text-slate-500"></i> <span class="text-sm tracking-wide">Master DPT</span></a>
+                <a href="/superadmin/quick-count" class="flex items-center gap-3.5 px-4 py-3 text-slate-400 hover:text-white hover:bg-slate-900/60 rounded-xl font-bold transition-colors"><i class="bi bi-pie-chart text-xl text-slate-500"></i> <span class="text-sm tracking-wide">Quick Count Live</span></a>
+                <a href="/superadmin/spin-paslon" class="flex items-center gap-3.5 px-4 py-3 bg-indigo-600 text-white rounded-xl font-black shadow-lg shadow-indigo-600/20 transition-colors"><i class="bi bi-dice-5-fill text-xl"></i> <span class="text-sm tracking-wide">Roda Putar Paslon</span></a>
+                <a href="/superadmin/log-aktivitas" class="flex items-center gap-3.5 px-4 py-3 text-slate-400 hover:text-white hover:bg-slate-900/60 rounded-xl font-bold transition-colors"><i class="bi bi-journal-text text-xl text-slate-500"></i> <span class="text-sm tracking-wide">Log Audit Sistem</span></a>
+            </nav>
+        </div>
+        <div class="p-5 border-t border-slate-800 bg-slate-950/40">
+            <button onclick="handleLogout()" class="w-full flex items-center justify-center gap-2 px-4 py-3 bg-red-500/10 hover:bg-red-500 text-red-400 hover:text-white rounded-xl text-xs font-bold border border-red-500/10 transition-all"><i class="bi bi-box-arrow-left text-base"></i> Keluar Sistem</button>
+        </div>
+    </aside>
+
+    <main class="flex-1 p-6 lg:p-8 space-y-8 overflow-y-auto max-w-[calc(100vw-18rem)]">
+        
+        <header class="flex flex-col lg:flex-row justify-between lg:items-center gap-6 pb-6 border-b border-slate-800">
+            <div>
+                <h1 class="text-2xl font-black text-white tracking-tight uppercase">MESIN PENGUNDIAN NOMOR URUT</h1>
+                <p class="text-slate-400 text-sm mt-1.5 font-medium leading-relaxed">Input pasangan calon secara live, kocok nomor urut serentak 30 detik, kunci berita acara ke database.</p>
+            </div>
+            <div class="flex items-center gap-3 shrink-0">
+                <a href="/superadmin/rekap-spin" class="bg-indigo-600 hover:bg-indigo-500 text-white px-4 py-2.5 rounded-xl text-xs font-bold flex items-center gap-1.5 border-0 shadow-md shadow-indigo-600/20 transition-colors no-underline">
+                    <i class="bi bi-file-earmark-text-fill text-base"></i> Lihat Berita Acara Rekap
+                </a>
+            </div>
+        </header>
+
+        <div class="grid grid-cols-1 xl:grid-cols-12 gap-6 items-start">
+            
+            <div class="xl:col-span-7 spotify-panel-dark space-y-4">
+                <div class="flex justify-between items-center border-b border-slate-800 pb-3">
+                    <h3 class="text-sm font-black text-indigo-400 uppercase tracking-wider flex items-center gap-2">
+                        <i class="bi bi-person-plus-fill"></i> Entri Kandidat Pleno Aktif
+                    </h3>
+                    <button onclick="tambahBarisPaslon()" class="bg-indigo-600 hover:bg-indigo-500 text-white px-3 py-1.5 rounded-xl text-xs font-bold flex items-center gap-1 border-0 cursor-pointer transition-all">
+                        <i class="bi bi-plus-circle-fill"></i> Tambah Paslon (+)
+                    </button>
+                </div>
+
+                <div id="container_input_paslon" class="space-y-3 max-h-[380px] overflow-y-auto pr-1 clean-scroll">
+                    <div class="baris-paslon bg-slate-950/60 border border-slate-800 p-3.5 rounded-xl grid grid-cols-12 gap-3 items-center relative group">
+                        <div class="col-span-1 text-center font-mono-kpu font-black text-slate-500 nomor-label">1</div>
+                        <div class="col-span-4 space-y-1">
+                            <input type="text" placeholder="Nama Calon Ketua" class="input-ketua w-full bg-slate-900 border border-slate-800 rounded-lg px-2.5 py-1.5 text-xs font-semibold text-white focus:border-indigo-500 focus:outline-none" oninput="sinkronisasiRodaDinamis()">
+                        </div>
+                        <div class="col-span-4 space-y-1">
+                            <input type="text" placeholder="Nama Calon Wakil" class="input-wakil w-full bg-slate-900 border border-slate-800 rounded-lg px-2.5 py-1.5 text-xs font-semibold text-white focus:border-indigo-500 focus:outline-none">
+                        </div>
+                        <div class="col-span-3">
+                            <span class="badge-nomor bg-slate-900 text-slate-500 border border-slate-800 block text-center py-1.5 rounded-lg font-mono-kpu font-black text-xs">BELUM SPIN</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="pt-4 border-t border-slate-800 space-y-3">
+                    <div class="space-y-1.5">
+                        <label class="block text-[11px] font-bold text-slate-400 uppercase tracking-wider"><i class="bi bi-pen-fill text-indigo-500"></i> Masukkan Nama Saksi-Saksi Pleno Sidang:</label>
+                        <input type="text" id="global_saksi_input" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2.5 text-white font-semibold text-xs focus:border-indigo-500 focus:outline-none" placeholder="Contoh: Pak Maryono (Kepsek), Ibu Citra (Pembina OSIS), Farel (Ketua MPK)">
+                    </div>
+                    <button onclick="simpanHasilPlenoKeDatabase()" id="btn_save_pleno" class="w-full bg-emerald-500 hover:bg-emerald-400 text-slate-950 py-3 rounded-xl text-xs font-black border-0 cursor-pointer shadow-xl transition-all uppercase tracking-wider">
+                        <i class="bi bi-cloud-check-fill text-sm mr-1"></i> Kunci & Simpan Berita Acara Ke Database
+                    </button>
+                </div>
+            </div>
+
+            <div class="xl:col-span-5 spotify-panel-dark flex flex-col items-center justify-center relative min-h-[440px] bg-slate-900/40">
+                <div style="width: 0; height: 0; border-top: 15px solid transparent; border-bottom: 15px solid transparent; border-right: 25px solid #f59e0b; position: absolute; right: 25px; top: 50%; transform: translateY(-50%); z-index: 30; filter: drop-shadow(0 2px 4px rgba(0,0,0,0.5));"></div>
+
+                <div class="relative w-64 h-64 sm:w-72 sm:h-72 bg-slate-950 rounded-full p-2 border-4 border-slate-800 shadow-2xl flex items-center justify-center">
+                    <canvas id="wheelCanvas" width="300" height="300" class="w-full h-full rounded-full"></canvas>
+                    
+                    <button id="spin_button" onclick="mulaiKocokRoletDinamis()" class="absolute w-16 h-16 bg-gradient-to-b from-amber-400 to-amber-600 text-slate-950 rounded-full font-black border-4 border-slate-950 shadow-xl flex flex-col items-center justify-center text-center cursor-pointer transition-transform active:scale-95 z-20">
+                        <span class="text-[8px] font-black tracking-wider leading-none">MUTAR</span>
+                        <span class="text-xs font-black">SPIN</span>
+                    </button>
+                </div>
+                <div class="mt-4 text-center">
+                    <span id="display_status_roda" class="text-[10px] bg-slate-950 border border-slate-800 text-amber-400 font-bold px-3 py-1 rounded-full uppercase tracking-wider">
+                        Sistem Siap Mengocok
+                    </span>
+                </div>
+            </div>
+
+        </div>
+    </main>
+
+    <script>
+        let listNomorUrutTersedia = [];
+        let isSpinning = false;
+        const warnaSektor = ['#1e1b4b', '#0f172a', '#311042', '#062f4f', '#1c2826', '#1e293b'];
+
+        // Sembuhkan bug visual blank saat refresh halaman pertama kali dimuat
+        window.onload = function() {
+            sinkronisasiRodaDinamis();
+        };
+
+        function tambahBarisPaslon() {
+            if (isSpinning) return;
+            const container = document.getElementById('container_input_paslon');
+            const totalBaris = container.getElementsByClassName('baris-paslon').length + 1;
+
+            const div = document.createElement('div');
+            div.className = "baris-paslon bg-slate-950/60 border border-slate-800 p-3.5 rounded-xl grid grid-cols-12 gap-3 items-center relative group";
+            div.innerHTML = `
+                <div class="col-span-1 text-center font-mono-kpu font-black text-slate-500 nomor-label">${totalBaris}</div>
+                <div class="col-span-4 space-y-1">
+                    <input type="text" placeholder="Nama Calon Ketua" class="input-ketua w-full bg-slate-900 border border-slate-800 rounded-lg px-2.5 py-1.5 text-xs font-semibold text-white focus:border-indigo-500 focus:outline-none" oninput="sinkronisasiRodaDinamis()">
+                </div>
+                <div class="col-span-4 space-y-1">
+                    <input type="text" placeholder="Nama Calon Wakil" class="input-wakil w-full bg-slate-900 border border-slate-800 rounded-lg px-2.5 py-1.5 text-xs font-semibold text-white focus:border-indigo-500 focus:outline-none">
+                </div>
+                <div class="col-span-3 flex items-center gap-2">
+                    <span class="badge-nomor bg-slate-900 text-slate-500 border border-slate-800 block text-center py-1.5 rounded-lg font-mono-kpu font-black text-xs flex-1">BELUM SPIN</span>
+                    <button onclick="hapusBarisPaslon(this)" class="bg-red-500/10 hover:bg-red-500 text-red-400 hover:text-white border border-red-500/10 p-1.5 rounded-lg cursor-pointer text-xs transition-all"><i class="bi bi-trash3-fill"></i></button>
+                </div>
+            `;
+            container.appendChild(div);
+            sinkronisasiRodaDinamis();
+        }
+
+        function hapusBarisPaslon(btn) {
+            if (isSpinning) return;
+            btn.closest('.baris-paslon').remove();
+            
+            const baris = document.getElementsByClassName('baris-paslon');
+            for(let i=0; i<baris.length; i++) {
+                baris[i].getElementsByClassName('nomor-label')[0].innerText = i + 1;
+            }
+            sinkronisasiRodaDinamis();
+        }
+
+        function sinkronisasiRodaDinamis() {
+            const totalPaslon = document.getElementsByClassName('baris-paslon').length;
+            listNomorUrutTersedia = [];
+            
+            const sektorLoop = totalPaslon > 0 ? totalPaslon : 2;
+            for (let i = 1; i <= sektorLoop; i++) {
+                listNomorUrutTersedia.push(i);
+            }
+            gambarRodaMurni();
+        }
+
+        function gambarRodaMurni(angleOffset = 0) {
+            const cvs = document.getElementById('wheelCanvas');
+            if (!cvs) return;
+            const ctx = cvs.getContext('2d');
+            ctx.clearRect(0, 0, 300, 300);
+            
+            if (listNomorUrutTersedia.length === 0) return;
+            const localArc = Math.PI / (listNomorUrutTersedia.length / 2);
+
+            for (let i = 0; i < listNomorUrutTersedia.length; i++) {
+                const angle = angleOffset + i * localArc;
+                ctx.fillStyle = warnaSektor[i % warnaSektor.length];
+                ctx.beginPath();
+                ctx.arc(150, 150, 140, angle, angle + localArc, false);
+                ctx.arc(150, 150, 30, angle + localArc, angle, true);
+                ctx.fill();
+                ctx.stroke();
+                ctx.lineWidth = 1;
+                ctx.strokeStyle = '#334155';
+
+                ctx.save();
+                ctx.fillStyle = '#f8fafc';
+                ctx.font = 'bold 15px JetBrains Mono';
+                ctx.translate(150 + Math.cos(angle + localArc/2) * 85, 150 + Math.sin(angle + localArc/2) * 85);
+                ctx.rotate(angle + localArc/2 + Math.PI/2);
+                ctx.textAlign = 'center';
+                ctx.fillText("NO. " + listNomorUrutTersedia[i], 0, 0);
+                ctx.restore();
+            }
+        }
+
+        // EXECUTE PUTARAN SERENTAK 30 DETIK (TIDAK TERLAJU MULUS & ANTI-KEMBAR)
+        function mulaiKocokRoletDinamis() {
+            const baris = document.getElementsByClassName('baris-paslon');
+            const totalPaslonReal = baris.length;
+            
+            if (totalPaslonReal === 0 || isSpinning) return;
+
+            // Validasi kelengkapan data nama ketua
+            for (let i = 0; i < totalPaslonReal; i++) {
+                const namaKetua = baris[i].getElementsByClassName('input-ketua')[0].value.trim();
+                if (!namaKetua) {
+                    Swal.fire({ title: 'Input Kosong', text: `Nama Calon Ketua Paslon ke-${i + 1} wajib diisi sebelum mengocok nomor!`, icon: 'warning', background: '#0f172a' });
+                    return;
+                }
+            }
+
+            isSpinning = true;
+            document.getElementById('spin_button').disabled = true;
+            document.getElementById('display_status_roda').innerText = "MENGOCOK (30 DETIK)...";
+            disableSemuaInput(true);
+
+            let counter = 0;
+            let angleFake = 0;
+            
+            Swal.fire({
+                title: 'Sidang Pleno Dimulai',
+                text: 'Roda rolet sedang mengacak urutan secara serentak. Estimasi waktu tunggu: 30 detik.',
+                icon: 'info',
+                background: '#0f172a',
+                color: '#fff',
+                showConfirmButton: false,
+                allowOutsideClick: false,
+                timer: 3000
+            });
+
+            // Guna interval sedikit lebih renggang (150ms) dan loncatan sudut tajam (55 derajat)
+            // Agar putarannya terkesan "patah-patah" berat (tidak terlalu mulus)
+            // Counter berhenti di 200 (200 * 150ms = 30.000ms alias pas 30 Detik!)
+            const intervalVisual = setInterval(() => {
+                angleFake += 55; 
+                gambarRodaMurni(angleFake * Math.PI / 180);
+                counter++;
+
+                if (counter >= 200) {
+                    clearInterval(intervalVisual);
+                    
+                    // VALIDASI LOCK ANTI-NGACOR: Buat array baru murni sepanjang jumlah paslon riil
+                    let nomorAcak = [];
+                    for (let i = 1; i <= totalPaslonReal; i++) {
+                        nomorAcak.push(i);
+                    }
+                    
+                    // Jalankan Algoritma Fisher-Yates Shuffle murni dari array lokal bersih
+                    for (let i = nomorAcak.length - 1; i > 0; i--) {
+                        const j = Math.floor(Math.random() * (i + 1));
+                        [nomorAcak[i], nomorAcak[j]] = [nomorAcak[j], nomorAcak[i]];
+                    }
+
+                    // Suntikkan hasil acak secara serentak, langsung semua baris sekaligus tanpa sisa
+                    for (let i = 0; i < totalPaslonReal; i++) {
+                        const currentBaris = baris[i];
+                        const badge = currentBaris.getElementsByClassName('badge-nomor')[0];
+                        const inputKetua = currentBaris.getElementsByClassName('input-ketua')[0];
+                        const inputWakil = currentBaris.getElementsByClassName('input-wakil')[0];
+                        const nomorHasil = nomorAcak[i];
+
+                        badge.innerHTML = `<span class="text-amber-400 font-black">NOMOR URUT: ${nomorHasil}</span>`;
+                        badge.dataset.nomorResult = nomorHasil;
+                        badge.className = "badge-nomor bg-amber-500/10 text-amber-400 border border-amber-500/25 block text-center py-1.5 rounded-lg font-mono-kpu font-black text-xs flex-1";
+                        
+                        inputKetua.disabled = true;
+                        inputWakil.disabled = true;
+                    }
+
+                    // Sinkronisasi ulang roda visual agar membagi sektor mengikuti nomor acak yang riil
+                    listNomorUrutTersedia = [...nomorAcak].sort((a, b) => a - b);
+                    gambarRodaMurni(0); 
+                    
+                    isSpinning = false;
+                    disableSemuaInput(false);
+                    document.getElementById('display_status_roda').innerText = "PENGUNDIAN SELESAI";
+
+                    Swal.fire({
+                        icon: 'success',
+                        title: 'Pengocokan Selesai!',
+                        text: 'Seluruh nomor urut pasangan calon telah berhasil diacak secara serentak & unik selama 30 detik.',
+                        background: '#0f172a',
+                        color: '#fff',
+                        confirmButtonColor: '#4f46e5'
+                    });
+                }
+            }, 150); 
+        }
+
+        function disableSemuaInput(status) {
+            const inputs = document.querySelectorAll('input[type="text"]');
+            inputs.forEach(i => { if(!status && i.closest('.baris-paslon')?.getElementsByClassName('badge-nomor')[0].dataset.nomorResult) { i.disabled = true; } else { i.disabled = status; } });
+            const buttons = document.querySelectorAll('button');
+            buttons.forEach(b => { if(b.id !== 'spin_button') b.disabled = status; });
+        }
+
+        // KIRIM DATA BULK PLENO KE BACKEND FLASK
+        async function simpanHasilPlenoKeDatabase() {
+            const saksiText = document.getElementById('global_saksi_input').value.trim();
+            if (!saksiText) {
+                Swal.fire({ title: 'Saksi Belum Diisi', text: 'Nama saksi-saksi sidang pleno wajib dicantumkan sebagai bukti hukum berita acara!', icon: 'warning', background: '#0f172a' });
+                return;
+            }
+
+            const baris = document.getElementsByClassName('baris-paslon');
+            const arrayDataPleno = [];
+
+            for (let i = 0; i < baris.length; i++) {
+                const inputKetua = baris[i].getElementsByClassName('input-ketua')[0].value.trim();
+                const inputWakil = baris[i].getElementsByClassName('input-wakil')[0].value.trim();
+                const badge = baris[i].getElementsByClassName('badge-nomor')[0];
+                const nomorHasil = badge.dataset.nomorResult;
+
+                if (!nomorHasil) {
+                    Swal.fire({ title: 'Pleno Belum Selesai', text: 'Anda belum melakukan pengocokan nomor urut paslon!', icon: 'warning', background: '#0f172a' });
+                    return;
+                }
+
+                arrayDataPleno.push({
+                    nama_ketua: inputKetua,
+                    nama_wakil: inputWakil ? inputWakil : '-',
+                    nomor_urut: nomorHasil
+                });
+            }
+
+            const saveBtn = document.getElementById('btn_save_pleno');
+            saveBtn.disabled = true;
+            saveBtn.innerText = "MENGUNCI TRANSAKSI DATABASE SERVER...";
+
+            try {
+                const response = await fetch('/api/superadmin/paslon/save-spin-massal', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        hasil_pleno: arrayDataPleno,
+                        saksi: saksiText
+                    })
+                });
+                const result = await response.json();
+
+                if (response.ok && result.status === "success") {
+                    Swal.fire({ title: 'Pleno Sah!', text: result.message, icon: 'success', background: '#0f172a', confirmButtonColor: '#10b981' }).then(() => {
+                        location.href = '/superadmin/rekap-spin'; 
+                    });
+                } else {
+                    Swal.fire({ title: 'Gagal Kunci', text: result.message, icon: 'error', background: '#0f172a' });
+                }
+            } catch {
+                Swal.fire({ title: 'Error Jaringan', text: 'Gagal menghubungkan data massal ke server database Flask.', icon: 'error', background: '#0f172a' });
+            } finally {
+                saveBtn.disabled = false;
+                saveBtn.innerText = "Kunci & Simpan Berita Acara Ke Database";
+            }
+        }
+
+        function handleLogout() { fetch('/api/logout', { method: 'POST' }).then(() => location.href = '/auth/login'); }
+    </script>
+</body>
+</html>
